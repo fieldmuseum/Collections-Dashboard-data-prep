@@ -1,0 +1,14 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+*.zip
+*.csv
+
+/data01raw/
+/data02processed/
+/output/
+/data03check/
+/outputSample
+/supplementary
