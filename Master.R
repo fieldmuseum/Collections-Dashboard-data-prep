@@ -1,6 +1,6 @@
 # Run this script to prep a Collections Dashboard dataset.
 
-#origdir <- "D:/colldash2/collprep/"
+#origdir <- "D:/CollDashCultural"
 origdir <- getwd()
 
 # Instructions
@@ -31,6 +31,14 @@ sourceDir <- function(path, trace = TRUE, ...) {
     source(file.path(path, nm), ...)
     if(trace) cat("\n")
   }
+}
+
+usePackage <- function(p) {
+  newPackages <- p[!(p %in% installed.packages()[, "Package"])]
+  if(length(newPackages))
+    install.packages(newPackages, dependencies = TRUE)
+  cat("Packages successfully loaded:\n")
+  sapply(p, require, character.only = TRUE, quietly = TRUE)
 }
 
 
