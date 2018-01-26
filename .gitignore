@@ -2,9 +2,11 @@
 .Rhistory
 .RData
 .Ruserdata
+.Rprofile
 
 *.zip
 *.csv
+*.Rproj
 
 /data01raw/
 /data02processed/
