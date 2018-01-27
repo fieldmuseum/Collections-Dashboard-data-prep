@@ -23,27 +23,6 @@ if (exists("CatDash03")==TRUE) {
 }
 
 
-# # # # # DarInstitutionCode
-# NOTE ####
-# - This is temporary; appropriate field should be part of imported dataset
-CatDash2$DarInstitutionCode <- "FMNH"
-
-
-# Merge any other missing columns, e.g.: 
-#  NOTE -- (Try to restrict this to 'dash010' script)
-
-DashMMa <- read.csv(file="dashMMa.csv", stringsAsFactors = F)
-DashMMbgz <- read.csv(file="dashMMbgz.csv", stringsAsFactors = F)
-DashMM <- rbind(DashMMa, DashMMbgz)
-DashMM <- unique(DashMM[,3:4])
-#DashMM$MulHasMultiMedia <- gsub("N",0,DashMM$MulHasMultiMedia)
-
-
-if (NROW(CatDash2$MulHasMultiMedia)==0) {
-  CatDash2 <- merge(CatDash2, DashMM, by="irn", all.x=T)
-}
-
-
 # Setup sample raw Catalogue data
 SampleGroupC <- c(1321,1:5,656944:656946,537448:537450,867365:867370,2099480,2099482,2668290:2668296,54463,50771,136283,2788069,2388945)
 CatDash03Samp1 <- CatDash2[which(CatDash2$irn %in% SampleGroupC),]
