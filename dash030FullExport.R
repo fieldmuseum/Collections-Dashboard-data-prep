@@ -57,48 +57,48 @@ FullDash9csv$Who[which(is.na(FullDash9csv$Who)==T)] <- ""
 FullDash9csv$Where[which(is.na(FullDash9csv$Where)==T)] <- ""
 
 
-# Setup sample dataset
-
-FullDashSample1 <- FullDash9csv[which(((FullDash9csv$irn %in% SampleGroupC) & FullDash9csv$RecordType=="Catalog") |
-                                       ((FullDash9csv$irn %in% SampleGroupA) & FullDash9csv$RecordType=="Accession")),]
-
-# Scrub out irn's and other identifiers
-ScrubCat <- CatDash03Samp1[,c("irn","DarGlobalUniqueIdentifier")]
-colnames(ScrubCat)[2] <- "DarGUIDorig"
-ScrubCat$irnScrub <- seq(12345,by=1,length.out = NROW(ScrubCat))
-ScrubCat$GUIDScrub <- seq(1234,by=1,length.out = NROW(ScrubCat))
-ScrubCat$GUIDScrub <- paste0("a",ScrubCat$irnScrub,"bc-1234-5a67-a123-a1bc23de", ScrubCat$GUIDScrub)
-
-ScrubAcc <- data.frame("irn" = AccBacklogSamp1[,c("irn")])
-ScrubAcc$irnScrub <- seq(54321,by=1,length.out = NROW(ScrubAcc))
-
-ScrubFull <- rbind(ScrubCat[,c("irn","irnScrub")], ScrubAcc[,c("irn","irnScrub")])
-
-# merge
-AccBacklogSamp <- merge(AccBacklogSamp1, ScrubAcc, by="irn", all.x=T)
-CatDash03Samp <- merge(CatDash03Samp1, ScrubCat, by="irn", all.x=T)
-FullDashSample <- merge(FullDashSample1, ScrubFull, by="irn", all.x=T)
-
-# scrub id #s
-AccBacklogSamp$irn <- AccBacklogSamp$irnScrub
-AccBacklogSamp <- select(AccBacklogSamp, -irnScrub)
-AccBacklogSamp$AccAccessionDescription <- gsub("[[:digit:]]","5",AccBacklogSamp$AccAccessionDescription)
-AccBacklogSamp$AccCatalogueNo <- gsub("[[:digit:]]","5",AccBacklogSamp$AccCatalogueNo)
-AccBacklogSamp$AccDescription <- gsub("[[:digit:]]","5",AccBacklogSamp$AccDescription)
-
-CatDash03Samp$irn <- CatDash03Samp$irnScrub
-CatDash03Samp$DarGlobalUniqueIdentifier <- CatDash03Samp$GUIDScrub
-CatDash03Samp <- select(CatDash03Samp, -c(irnScrub,GUIDScrub,DarGUIDorig))
-CatDash03Samp$DarCatalogNumber <- gsub("[[:digit:]]","5",CatDash03Samp$DarCatalogNumber)
-CatDash03Samp$DarImageURL <- gsub("[[:digit:]]","5",CatDash03Samp$DarImageURL)
-CatDash03Samp$DarLatitude <- as.integer(CatDash03Samp$DarLatitude)
-CatDash03Samp$DarLongitude <- as.integer(CatDash03Samp$DarLongitude)
-
-FullDashSample$irn <- FullDashSample$irnScrub
-FullDashSample <- select(FullDashSample, -irnScrub)
-FullDashSample$DarLatitude <- as.integer(FullDashSample$DarLatitude)
-FullDashSample$DarLongitude <- as.integer(FullDashSample$DarLongitude)
-
+# # Setup sample dataset
+# 
+# FullDashSample1 <- FullDash9csv[which(((FullDash9csv$irn %in% SampleGroupC) & FullDash9csv$RecordType=="Catalog") |
+#                                        ((FullDash9csv$irn %in% SampleGroupA) & FullDash9csv$RecordType=="Accession")),]
+# 
+# # Scrub out irn's and other identifiers
+# ScrubCat <- CatDash03Samp1[,c("irn","DarGlobalUniqueIdentifier")]
+# colnames(ScrubCat)[2] <- "DarGUIDorig"
+# ScrubCat$irnScrub <- seq(12345,by=1,length.out = NROW(ScrubCat))
+# ScrubCat$GUIDScrub <- seq(1234,by=1,length.out = NROW(ScrubCat))
+# ScrubCat$GUIDScrub <- paste0("a",ScrubCat$irnScrub,"bc-1234-5a67-a123-a1bc23de", ScrubCat$GUIDScrub)
+# 
+# ScrubAcc <- data.frame("irn" = AccBacklogSamp1[,c("irn")])
+# ScrubAcc$irnScrub <- seq(54321,by=1,length.out = NROW(ScrubAcc))
+# 
+# ScrubFull <- rbind(ScrubCat[,c("irn","irnScrub")], ScrubAcc[,c("irn","irnScrub")])
+# 
+# # merge
+# AccBacklogSamp <- merge(AccBacklogSamp1, ScrubAcc, by="irn", all.x=T)
+# CatDash03Samp <- merge(CatDash03Samp1, ScrubCat, by="irn", all.x=T)
+# FullDashSample <- merge(FullDashSample1, ScrubFull, by="irn", all.x=T)
+# 
+# # scrub id #s
+# AccBacklogSamp$irn <- AccBacklogSamp$irnScrub
+# AccBacklogSamp <- select(AccBacklogSamp, -irnScrub)
+# AccBacklogSamp$AccAccessionDescription <- gsub("[[:digit:]]","5",AccBacklogSamp$AccAccessionDescription)
+# AccBacklogSamp$AccCatalogueNo <- gsub("[[:digit:]]","5",AccBacklogSamp$AccCatalogueNo)
+# AccBacklogSamp$AccDescription <- gsub("[[:digit:]]","5",AccBacklogSamp$AccDescription)
+# 
+# CatDash03Samp$irn <- CatDash03Samp$irnScrub
+# CatDash03Samp$DarGlobalUniqueIdentifier <- CatDash03Samp$GUIDScrub
+# CatDash03Samp <- select(CatDash03Samp, -c(irnScrub,GUIDScrub,DarGUIDorig))
+# CatDash03Samp$DarCatalogNumber <- gsub("[[:digit:]]","5",CatDash03Samp$DarCatalogNumber)
+# CatDash03Samp$DarImageURL <- gsub("[[:digit:]]","5",CatDash03Samp$DarImageURL)
+# CatDash03Samp$DarLatitude <- as.integer(CatDash03Samp$DarLatitude)
+# CatDash03Samp$DarLongitude <- as.integer(CatDash03Samp$DarLongitude)
+# 
+# FullDashSample$irn <- FullDashSample$irnScrub
+# FullDashSample <- select(FullDashSample, -irnScrub)
+# FullDashSample$DarLatitude <- as.integer(FullDashSample$DarLatitude)
+# FullDashSample$DarLongitude <- as.integer(FullDashSample$DarLongitude)
+# 
 
 print(paste(date(), "-- ...finished final prep; starting export of final dataset & LUTs."))
 
@@ -119,6 +119,15 @@ if (NROW(FullDash9csv)>0 & NROW(FullD9_check2)==0) {
 } else {
   print("Error - Check for duplicate records; FullDash13.csv not exported")
 }
+
+
+# Dump test dataset for Cultural Collections Dashboard
+# - TO DO: 
+#       - cut rbind with Accessions when those are absent?
+#       - also cut DwC dataset imports when absent?
+
+FullDash10test <- FullDash9csv[which(FullDash9csv$RecordType=="Catalog" & FullDash9csv$DarCollectionCode=="Anthropology"),]
+write.csv(FullDash10test, file = "FullDash13_10test.csv", na="", row.names = FALSE)
 
 
 # Bind extra dummy-data (with multiple institutions)

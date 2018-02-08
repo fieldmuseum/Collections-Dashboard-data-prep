@@ -40,7 +40,8 @@ library("plyr")
 if (exists("DWC2_Back")==T) {
   
   # Combine Accession + Catalogue datasets
-  CatDash3 <- plyr::rbind.fill(CatDash2, DWC3, DWC2_Back)
+  # CatDash3 <- plyr::rbind.fill(CatDash2, DWC3, DWC2_Back) # typo?
+  CatDash3 <- plyr::rbind.fill(CatDash2, DWC2_Back)
   
 } else {
 

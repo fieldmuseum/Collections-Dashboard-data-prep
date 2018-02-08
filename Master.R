@@ -41,6 +41,11 @@ usePackage <- function(p) {
   sapply(p, require, character.only = TRUE, quietly = TRUE)
 }
 
+simpleCap <- function(x) {
+  s <- strsplit(tolower(x), " ")[[1]]
+  paste(toupper(substring(s, 1, 1)), substring(s, 2),
+        sep = "", collapse = " ")
+}
 
 sourceDir(paste(getwd(),"/functions",sep=""))
 
@@ -49,16 +54,24 @@ usePackage("plyr")
 usePackage("dplyr")
 
 
-# Run scripts
-
-
-# Added DwC-Archive-import script May-2017
-
+# Select which scripts to run
 DarYN <- readline(prompt="Do you need to import a Darwin Core archive? (Y/N) ")
+AccYN <- readline(prompt="Do you need to import accession (backlog) dataset/s? (Y/N) ")
+
+
+# Run selected scripts
 if (DarYN=="Y") { source("dash005DarPrep.R") }
 
+# Added OI recordset import 06-feb-2018
+# ( CSV from Foy's shared XLSX report )
+source("dash006OIcsvImport.R")
+
+# Added Penn-Museum recordset import 26-jan-2018
+# ( https://www.penn.museum/collections/objects/data.php )
+source("dash007PMcsvImport.R")
+
 if (!file.exists("data01raw/CatDash03bu.csv")) { source("dash010CatPrep.R") }
-if (!file.exists("data01raw/AccBacklogBU.csv")) { source("dash015AccPrep.R") }
+if (AccYN=="Y") { source("dash015AccPrep.R") }
 
 source("dash020FullBind.R")
 source("dash021Where.R")
@@ -72,8 +85,8 @@ source("dash026LoansPrep.R")
 source("dash027VisitPrep.R")
 source("dash028Ecoregions.R")
 
-# Add exports to ...30FullExport.R for new [commented-out] scripts 16, 17, & 25
 source("dash030FullExport.R")
 
-#source("dash050GlobalSummary.R")
+# Institution summaries?
+#source("dash050InstData.R")
 
