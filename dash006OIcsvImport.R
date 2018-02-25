@@ -33,7 +33,7 @@ OIlist = list.files(pattern="*.csv$")
 # # CP1200 seems to work; alternatively, try UCS-2LE
 # # ...otherwise, if UTF-16: https://stat.ethz.ch/R-manual/R-devel/library/base/html/iconv.html
 
-# import files with assigned encoding
+# import files with assigned encoding ####
 list2env(
   lapply(setNames(OIlist, make.names(gsub(".csv$", "_OI", OIlist))), # pretty names break stuff
          read.table, 
@@ -42,15 +42,17 @@ list2env(
          stringsAsFactors = F),
   envir = .GlobalEnv)
 
-# cleanup empty tables
+
+# cleanup empty tables ####
 to.rm <- unlist(eapply(.GlobalEnv, function(x) is.data.frame(x) && NROW(x) < 1))
 rm(list = names(to.rm)[to.rm], envir = .GlobalEnv)
 
-# rename catalog 
+
+# rename catalog ####
 OIecatalog <- ecatalog_OI
 rm(ecatalog_OI)
 
-# prep multimedia tables 
+# prep multimedia tables ####
 #   Need logic for PDFs?
 #   Need to re-export DetResourceType?
 MulMulti_OI$mediaURL <- paste0("https://oi-idb-static.uchicago.edu/multimedia/",
@@ -66,60 +68,82 @@ MulMulti_OI <- unite(MulMulti_OI, Media, irn:mediaURL, sep=" | ")
 
 # WHAT
 # ColClassification
-CatOI_class <- unique(OIecatalog[order(OIecatalog$ColClassification),c("ColClassification")])
+OI_clas <- unique(OIecatalog[order(OIecatalog$ColClassification), c("ColClassification")])
 
-# CatDescription  # should unlist/break up to make shorter LUT / better search
-CatOI_desc <- unique(OIecatalog[order(OIecatalog$CatDescription),c("CatDescription")])
+# CatDescription  # NEED TO PARE DOWN (keep only most common?)
+OI_desc <- unique(OIecatalog[order(OIecatalog$CatDescription), c("CatDescription")])
+OI_desc <- unlist(strsplit(OI_desc, split = " |-"))
+OI_desc <- gsub("[[:punct:]]","",OI_desc)
+OI_desc <- OI_desc[which(nchar(OI_desc)>4)]
 
 # ProMaterials
-CatOI_mate
+OI_mate <- unique(ProMater_OI[order(ProMater_OI$ProMaterials), c("ProMaterials")])
 
 # CatCollection
-CatOI_coll
+OI_coll <- unique(OIecatalog[order(OIecatalog$ColCollection), c("ColCollection")])
 
 # InsDialect
-CatOI_dial
+OI_dial <- unique(InsDiale_OI[order(InsDiale_OI$InsDialect), c("InsDialect")])
 
 # InsScript
-CatOI_scri
+OI_scri <- unique(InsScrip_OI[order(InsScrip_OI$InsScript), c("InsScript")])
+
+OIlut_what <- unique(c(OI_clas,
+                       OI_desc,
+                       OI_mate,
+                       OI_coll,
+                       OI_dial,
+                       OI_scri
+                       ))
 
 
 # WHEN
 # DatKingRuler # also in WHO-LUT
-CatOI_king 
+OI_king <- unique(DatKingR_OI[order(DatKingR_OI$DatKingRuler), c("DatKingRuler")])
 
 # DatDynasty
-CatOI_dyna 
+OI_dyna <- unique(DatDynas_OI[order(DatDynas_OI$DatDynasty), c("DatDynasty")])
 
 # DatPeriod
-CatOI_peri
+OI_peri <- unique(DatPerio_OI[order(DatPerio_OI$DatPeriod), c("DatPeriod")])
 
 # DatDateMade
-CatOI_made 
+OI_made <- unique(OIecatalog[order(OIecatalog$DatDateMade), c("DatDateMade")])
 
 # AcqDateReceived
-CatOI_rece 
+OI_rece <- unique(OIecatalog[order(OIecatalog$AcqDateReceived), c("AcqDateReceived")])
+
+OIlut_when <- unique(c(OI_king,
+                       OI_dyna,
+                       OI_peri,
+                       OI_made,
+                       OI_rece
+                       ))
 
 
 # WHERE
 # ProCountry
-CatOI_coun 
+OI_coun <- unique(OIecatalog[order(OIecatalog$ProCountry), c("ProCountry")])
 
 # ProRegion
-CatOI_regi 
+OI_regi <- unique(OIecatalog[order(OIecatalog$ProRegion), c("ProRegion")])
 # ArcLocus?
 
+OIlut_where <- unique(c(OI_coun,
+                        OI_regi
+                        ))
 
 # WHO
-
-CatOI_king # also in WHEN-LUT
-
 # ProAlternateNames
-CatOI_names <- unique(ProAlter_OI[order(ProAlter_OI$ProAlternateNames),c("ProAlternateNames")])
+OI_name <- unique(ProAlter_OI[order(ProAlter_OI$ProAlternateNames), c("ProAlternateNames")])
 
 # ProCulturalAffiliation
-CatOI_cult 
+OI_cult <- unique(ProCultu_OI[order(ProCultu_OI$ProCulturalAffiliation), c("ProCulturalAffiliation")])
 
+OIlut_who <- unique(c(OI_name,
+                      OI_cult,
+                      OI_king # also in WHEN-LUT
+                      ))
 
 
 # make a list of the OI dataframes 
@@ -157,7 +181,7 @@ CatOI02 <- OImerged[order(OImerged$irn),-1]
 CatOI02 <- unique(CatOI02)
 rm(OImerged)
 
-# If need to drop columns &/or re-check uniqueness:
+# If need to drop columns &/or re-check uniqueness of catalog records:
 # 
 # # build list of columns to drop
 # drops <- c("irn.1","DetResourceType","MulIdentifier",
@@ -176,11 +200,11 @@ CatOI03 <- data.frame(
   "irn" = paste0("OI",CatOI02$irn),
   "DarGlobalUniqueIdentifier" = CatOI02$AdmGUIDValue,
   "AdmDateInserted" = CatOI02$AdmDateInserted,
-  "AdmDateModified" = CatOI02$AdmDateInserted,
+  "AdmDateModified" = CatOI02$AdmDateModified,
   "DarImageURL" = CatOI02$Media,
   "DarIndividualCount" = "1",
   "DarBasisOfRecord" = "Artefact",
-  "DarLatitude" = "",
+  "DarLatitude" = "", # CatOI02$ArcLocus ?
   "DarLongitude" = "",
   "DarCountry" = CatOI02$ProCountry,
   "DarContinent" = "",
@@ -192,35 +216,40 @@ CatOI03 <- data.frame(
   "DarEarliestEpoch" = "",
   "DarEarliestEra" = "",
   "DarEarliestPeriod" = CatOI02$DatDateMade,
-  "AttPeriod_tab" = CatOI02$DatPeriod,
-  "DesEthnicGroupSubgroup_tab" = CatOI02$ProC ,
-  "DesMaterials_tab" = CatOI02$material,
+  "AttPeriod_tab" = paste(CatOI02$DatDynasty,  # better way to map/parse these?
+                          CatOI02$DatKingRuler,
+                          CatOI02$DatPeriod,
+                          sep = " | "),
+  "DesEthnicGroupSubgroup_tab" = paste(CatOI02$ColCollection,  # better way to map/parse these?
+                                       CatOI02$ProCulturalAffiliation,
+                                       CatOI02$ProAlternateNames,
+                                       sep = " | "),
+  "DesMaterials_tab" = CatOI02$ProMaterials,
   "DarOrder" = "",
   "DarScientificName" = "",
   "ClaRank" = "",
   "ComName_tab" = "",
-  "DarRelatedInformation" = paste(CatOI02$native_name, 
-                                  CatOI02$description,
-                                  CatOI02$technique,
-                                  CatOI02$iconography,
+  "DarRelatedInformation" = paste(CatOI02$CatDescription,  # better way to map/parse these? 
+                                  CatOI02$InsDialect,
+                                  CatOI02$InsScript,
                                   sep = " | "),
-  "CatProject_tab" = paste(CatOI02$accession_credit_line,
-                           CatOI02$creator,
-                           sep = " | "),
-  "DarYearCollected" = "",
+  "CatProject_tab" = "",
+  "DarYearCollected" = CatOI02$AcqDateReceived,  # check date format
   "DarMonthCollected" = "",
-  "EcbNameOfObject" = CatOI02$object_name,
+  "EcbNameOfObject" = CatOI02$ColClassification,
   "CatLegalStatus" = "",
-  "CatDepartment" = "",
-  "DarCatalogNumber" = CatOI02$object_number,
+  "CatDepartment" = CatOI02$SecDepartment,
+  "DarCatalogNumber" = paste(CatOI02$ColPrefix,
+                             CatOI02$ColRegistrationNumber,
+                             CatOI02$ColSuffix),
   "DarCollector" = "",
   "MulHasMultiMedia" = "",
-  "DarStateProvince" = CatOI02$provenience,
+  "DarStateProvince" = CatOI02$ProRegion,
   "DarInstitutionCode" = "OI",
   stringsAsFactors = F
 )
 
 # write the lumped/full/single CSV back out
-write.csv(CatOI04, file="GroupOI.csv", row.names = F, na="")
+write.csv(CatOI03, file="GroupOI.csv", row.names = F, na="")
 
 setwd(origdir)  # up to /collprep/
