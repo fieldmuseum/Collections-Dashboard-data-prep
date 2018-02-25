@@ -36,15 +36,15 @@ CatDash02 <- unique(CatDash02)
 rm(CatDash01)
 
 # Remove duplicate irn's
-CatIRNcount <- NROW(levels(as.factor(CatDash02$irn)))
+CatGUIDcount <- NROW(levels(as.factor(CatDash02$DarGlobalUniqueIdentifier)))
 
-CatDash02$IRNseq <- sequence(rle(as.character(CatDash02$irn))$lengths)
+CatDash02$GUIDseq <- sequence(rle(as.character(CatDash02$DarGlobalUniqueIdentifier))$lengths)
 
 #CatDash03 <- CatDash02[which(nchar(as.character(CatDash02$DarGlobalUniqueIdentifier)) > 3 & CatDash02$IRNseq == 1),]
-CatDash03 <- CatDash02[which(CatDash02$IRNseq == 1),]
-CatCheck <- CatDash02[which(CatDash02$IRNseq > 1),]
+CatDash03 <- CatDash02[which(CatDash02$GUIDseq == 1),]
+CatCheck <- CatDash02[which(CatDash02$GUIDseq > 1),]
 
-CatDash03 <- dplyr::select(CatDash03, -IRNseq)
+CatDash03 <- dplyr::select(CatDash03, -GUIDseq)
 
 
 # write the lumped/full/single CSV back out

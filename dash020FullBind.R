@@ -43,12 +43,17 @@ if (exists("DWC2_Back")==T) {
   # CatDash3 <- plyr::rbind.fill(CatDash2, DWC3, DWC2_Back) # typo?
   CatDash3 <- plyr::rbind.fill(CatDash2, DWC2_Back)
   
-} else {
+} else if (exists("DwC3")==T) {
 
   CatDash3 <- rbind(CatDash2, DWC3)
 
-}
+} else {
+  
+  CatDash3 <- CatDash2
 
+  }
+
+# Fix for OI & PM ####
 CatDash3$MulHasMultiMedia <- gsub("Y","1",CatDash3$MulHasMultiMedia)
 CatDash3$MulHasMultiMedia <- gsub("N","0",CatDash3$MulHasMultiMedia)
 CatDash3$MulHasMultiMedia[which(is.na(CatDash3$MulHasMultiMedia)==T)] <- "0"
@@ -58,7 +63,13 @@ CatDash3$DarImageURL <- as.integer(CatDash3$MulHasMultiMedia)
 # Add/Adjust columns for Quality calculation
 CatDash3$DarIndividualCount <- as.numeric(CatDash3$DarIndividualCount)  # NA's from coercion are ok here
 
-CatDash3$RecordType[which(is.na(CatDash3$RecordType)==T)] <- "Catalog"
+# Is this right?
+if (is.character(CatDash3$RecordType)==F) {
+  CatDash3$RecordType <- "Catalog"
+  # CatDash3$RecordType[which(is.na(CatDash3$RecordType)==T)] <- "Catalog"
+} else {
+  CatDash3$RecordType[which(is.na(CatDash3$RecordType)==T)] <- "Catalog"
+}
 
 species <- c("Species","Subspecies","Variety","Subvariety","Form","Subform","Proles","Aberration")
 genus <- c("Genus","Subgenus","Section","Subsection")
