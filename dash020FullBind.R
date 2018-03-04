@@ -24,9 +24,9 @@ if (exists("CatDash03")==TRUE) {
 
 
 # Setup sample raw Catalogue data
-SampleGroupC <- c(1321,1:5,656944:656946,537448:537450,867365:867370,2099480,2099482,2668290:2668296,54463,50771,136283,2788069,2388945)
-CatDash03Samp1 <- CatDash2[which(CatDash2$irn %in% SampleGroupC),]
-
+SampleGroupC <- c(1321,1:5,615690:615694,537448:537450,567365:567370,245483:245488,99482,8290:8296,54463,50771,136283,288069,388945)
+# CatDash03Samp1 <- CatDash2[which(CatDash2$irn %in% SampleGroupC),]
+CatDash03Samp1 <- CatDash2[SampleGroupC,]
 
 CatDash2 <- unique(CatDash2)
 #check <- dplyr::count(CatDash3, irn)
@@ -113,26 +113,30 @@ AccBacklogSamp1 <- AccDash1[which(AccDash1$irn %in% SampleGroupA),]
 
 
 # Map Acc fields to Cat fields
-AccDash2 <- as.data.frame(cbind("irn" = AccDash1$irn,
-                                "DarCountry" = AccDash1$LocCountry_tab,
-                                "DarContinent" = AccDash1$LocContinent_tab,
-                                "DarWaterBody" = AccDash1$LocOcean_tab,
-                                "DarCollectionCode" = AccDash1$AccCatalogue,
-                                # "DesKDescription0" = paste(AccDash1$AccAccessionDescription,"|",AccDash1$AccDescription),
-                                "AccDescription" = AccDash1$AccDescription,
-                                "AccDescription2" = AccDash1$AccAccessionDescription,
-                                "DarIndividualCount"= as.numeric(AccDash1$CatTotal),
-                                # "AccTotalObjects"= AccDash1$AccTotalObjects,
-                                # "AccTotBothItOb"= as.integer(0),
-                                # "AccTotalObjects" = AccDash1$AccTotalObjects,
-                                "AccLocality" = AccDash1$AccLocality,
-                                "AccGeography" = AccDash1$AccGeography,
-                                "AccCatalogueNo" = AccDash1$AccCatalogueNo,
-                                "RecordType" = "Accession",
-                                "AccTotal" = AccDash1$AccTotal,
-                                "Backlog" = AccDash1$backlog),
-                                "DarInstitutionCode" = "FMNH",  # AccDash1$DarInstitutionCode,
-                          stringsAsFactors=F)
+AccDash2 <- data.frame("irn" = AccDash1$irn,
+                       "DarGlobalUniqueIdentifier" = paste(AccDash1$DarInstitutionCode,
+                                                           "accession-irn",
+                                                           AccDash1$irn,
+                                                           sep="-"),
+                       "DarCountry" = AccDash1$LocCountry_tab,
+                       "DarContinent" = AccDash1$LocContinent_tab,
+                       "DarWaterBody" = AccDash1$LocOcean_tab,
+                       "DarCollectionCode" = AccDash1$AccCatalogue,
+                       # "DesKDescription0" = paste(AccDash1$AccAccessionDescription,"|",AccDash1$AccDescription),
+                       "AccDescription" = AccDash1$AccDescription,
+                       "AccDescription2" = AccDash1$AccAccessionDescription,
+                       "DarIndividualCount"= as.numeric(AccDash1$CatTotal),
+                       # "AccTotalObjects"= AccDash1$AccTotalObjects,
+                       # "AccTotBothItOb"= as.integer(0),
+                       # "AccTotalObjects" = AccDash1$AccTotalObjects,
+                       "AccLocality" = AccDash1$AccLocality,
+                       "AccGeography" = AccDash1$AccGeography,
+                       "AccCatalogueNo" = AccDash1$AccCatalogueNo,
+                       "RecordType" = "Accession",
+                       "AccTotal" = AccDash1$AccTotal,
+                       "Backlog" = AccDash1$backlog,
+                       "DarInstitutionCode" = AccDash1$DarInstitutionCode,  # "FMNH",
+                       stringsAsFactors=F)
 
 AccDash2$DarIndividualCount <- as.numeric(AccDash2$DarIndividualCount)
 
@@ -148,6 +152,8 @@ print(paste("... ",substr(date(), 12, 19), "- cleaning up full data table..."))
 rm(CatDash2, AccDash1)
 FullDash2 <- unique(FullDash)
 
+# check duplicates
+FullDash0check <- dplyr::count(FullDash, DarInstitutionCode, DarGlobalUniqueIdentifier)
 
 # Qualilty - rank records ####
 FullDash2$Quality <- 1

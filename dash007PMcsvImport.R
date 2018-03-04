@@ -48,7 +48,7 @@ CatPenn04 <- data.frame(
   "AdmDateInserted" = "",
   "AdmDateModified" = "",
   "DarImageURL" = "",
-  "DarIndividualCount" = "",
+  "DarIndividualCount" = "1",
   "DarBasisOfRecord" = "Artefact",
   "DarLatitude" = "",
   "DarLongitude" = "",

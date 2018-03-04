@@ -12,6 +12,9 @@ print(paste("... ",substr(date(), 12, 19), "- cleaning WHERE data..."))
 # Clean 'Where' data [plus pre-concatenated AccGeography values] ####
 
 AccGeographyLUT <- read.csv(file="AccGeographyLUT.csv", stringsAsFactors = F)
+AccGeographyLUT <- unique(c(unlist(AccGeographyLUT), unlist(OIlut_where)))
+AccGeographyLUT <- data.frame("WhereLUT" = AccGeographyLUT,
+                              stringsAsFactors = F)
 
 date()
 FullDash2$cleanDarCountry <- gsub("\\[|\\]|[(,)&?!=;/:#\"*]|[-]|[0-9]", " ", FullDash2$DarCountry)

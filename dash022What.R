@@ -200,10 +200,13 @@ EcbNameCount <- dplyr::count(EcbNameLUT, WhatLUT)
 EcbNameCount <- EcbNameCount[which(EcbNameCount$n > 5),]
 EcbNameLUT <- data.frame("WhatLUT"=unique(EcbNameLUT[which(EcbNameLUT$WhatLUT %in% EcbNameCount$WhatLUT),]), stringsAsFactors=F)
 
-
+OIwhatLUT <- data.frame("WhatLUT"=unique(gsub("\\d+|^\\s+|\\s+$", "", OIlut_what)), stringsAsFactors = F)
+OIwhatLUT$WhatLUT <- sapply(OIwhatLUT$WhatLUT, simpleCap)
+OIwhatLUT <- unique(OIwhatLUT)
 # rbind unique cleaned lists from each field to one WhatLUT
 
-WhatLUT <- rbind(CollectionLUT, ComNam1LUT, ComNam2LUT, DarOrderLUT, AccDescriptionLUT, AccDescription2LUT, DesDarRelatedLUT, EcbNameLUT)
+WhatLUT <- rbind(OIwhatLUT, # might need ot exclude this one; it's LONG
+                 CollectionLUT, ComNam1LUT, ComNam2LUT, DarOrderLUT, AccDescriptionLUT, AccDescription2LUT, DesDarRelatedLUT, EcbNameLUT)
 WhatLUT$WhatLUT <- as.character(WhatLUT$WhatLUT)
 WhatLUT$WhatLUT <- sapply (WhatLUT$WhatLUT, simpleCap)
 WhatLUT <- unique(WhatLUT)
@@ -234,7 +237,8 @@ WhatLUT6 <- unique(WhatLUT6)
 
 # Alternative WhatLUT  (actually only using this WhatLUTB currently)
 
-WhatLUTB <- rbind(CollectionLUT, ComNam1LUT, ComNam2LUT, DarOrderLUT, AccDescriptionLUT, AccDescription2LUT, DesDarRelatedLUT) # EcbNameLUT, DesMaterialsLUT
+WhatLUTB <- rbind(OIwhatLUT, # LONG; this one needs to be shortened
+                  CollectionLUT, ComNam1LUT, ComNam2LUT, DarOrderLUT, AccDescriptionLUT, AccDescription2LUT, DesDarRelatedLUT) # EcbNameLUT, DesMaterialsLUT
 WhatLUTB <- unique(WhatLUTB)
 WhatLUTB <- strsplit(as.character(WhatLUTB$WhatLUT), "\\|")
 WhatLUTB <- data.frame("WhatLUT"=unique(unlist(WhatLUTB)), stringsAsFactors = F)
