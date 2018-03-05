@@ -31,20 +31,9 @@ CatDash01 <- do.call(rbind, lapply(DashList, read.csv, stringsAsFactors = F))
 setwd(paste0(origdir,"/data01raw"))  # up to /collprep/data01raw/
 
 
-CatDash02 <- CatDash01[order(CatDash01$irn),-c(1,2)]
-CatDash02 <- unique(CatDash02)
+CatDash02 <- CatDash01[order(CatDash01$DarGlobalUniqueIdentifier, CatDash01$DarCatalogNumber),-c(1,2)]
+CatDash03 <- unique(CatDash02)
 rm(CatDash01)
-
-# Remove duplicate irn's
-CatGUIDcount <- NROW(levels(as.factor(CatDash02$DarGlobalUniqueIdentifier)))
-
-CatDash02$GUIDseq <- sequence(rle(as.character(CatDash02$DarGlobalUniqueIdentifier))$lengths)
-
-#CatDash03 <- CatDash02[which(nchar(as.character(CatDash02$DarGlobalUniqueIdentifier)) > 3 & CatDash02$IRNseq == 1),]
-CatDash03 <- CatDash02[which(CatDash02$GUIDseq == 1),]
-CatCheck <- CatDash02[which(CatDash02$GUIDseq > 1),]
-
-CatDash03 <- dplyr::select(CatDash03, -GUIDseq)
 
 
 # write the lumped/full/single CSV back out

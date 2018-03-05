@@ -52,6 +52,7 @@ sourceDir(paste(getwd(),"/functions",sep=""))
 usePackage("tidyr")
 usePackage("plyr")
 usePackage("dplyr")
+usePackage("purrr")
 
 
 # Select which scripts to run
@@ -70,7 +71,8 @@ source("dash006OIcsvImport.R")
 # ( https://www.penn.museum/collections/objects/data.php )
 source("dash007PMcsvImport.R")
 
-if (!file.exists("data01raw/CatDash03bu.csv")) { source("dash010CatPrep.R") }
+# if (!file.exists("data01raw/CatDash03bu.csv")) { source("dash010CatPrep.R") }
+source("dash010CatPrep.R")
 if (AccYN=="Y") { source("dash015AccPrep.R") }
 
 source("dash020FullBind.R")

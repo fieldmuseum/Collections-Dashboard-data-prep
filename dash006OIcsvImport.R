@@ -195,10 +195,10 @@ rm(OImerged)
 
 
 CatOI03 <- data.frame(
-  "Group1_key" = CatOI02$irn,
+  "Group1_key" = paste0("OI",CatOI02$irn),
   "ecatalogue_key" = "",
-  "irn" = paste0("OI",CatOI02$irn),
-  "DarGlobalUniqueIdentifier" = CatOI02$AdmGUIDValue,
+  "irn" = CatOI02$irn,
+  "DarGlobalUniqueIdentifier" = CatOI02$AdmGUIDValue, # duplicates for A/B catalog records?
   "AdmDateInserted" = CatOI02$AdmDateInserted,
   "AdmDateModified" = CatOI02$AdmDateModified,
   "DarImageURL" = CatOI02$Media,
@@ -207,7 +207,7 @@ CatOI03 <- data.frame(
   "DarLatitude" = "", # CatOI02$ArcLocus ?
   "DarLongitude" = "",
   "DarCountry" = CatOI02$ProCountry,
-  "DarContinent" = "",
+  "DarContinent" = "Africa",  # hard-coded here for Egypt test-dataset
   "DarContinentOcean" = "",
   "DarWaterBody" = "",
   "DarCollectionCode" = "Anthropology",
@@ -248,6 +248,23 @@ CatOI03 <- data.frame(
   "DarInstitutionCode" = "OI",
   stringsAsFactors = F
 )
+
+
+# # check duplicate GUIDs ####
+# OIcheck <- dplyr::count(CatOI03, DarGlobalUniqueIdentifier)
+# OIcheckGUID <- OIcheck[OIcheck$n>1,]
+# OIcheckFull <- CatOI03[which(CatOI03$DarGlobalUniqueIdentifier %in% OIcheckGUID$DarGlobalUniqueIdentifier),]
+# 
+# if(NROW(OIcheckGUID)>0) {
+#   print(paste("Check 'OIcheck' CSVs for these records: ", 
+#               NROW(OIcheckGUID), "duplicate GUIDs in ", 
+#               NROW(OIcheckFull), "OI records"))
+#   write.csv(OIcheckFull,"OIcheck.csv", row.names = F, na="")
+# } else {
+#   print(paste("No duplicate OI GUIDs; all clear!"))
+# }
+# 
+# CatOI04 <- CatOI03[!(CatOI03$DarGlobalUniqueIdentifier %in% OIcheckGUID$DarGlobalUniqueIdentifier),]
 
 # write the lumped/full/single CSV back out
 write.csv(CatOI03, file="GroupOI.csv", row.names = F, na="")

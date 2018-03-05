@@ -132,27 +132,27 @@ FullDash10test <- FullDash9csv[which(FullDash9csv$RecordType=="Catalog" & FullDa
 write.csv(FullDash10test, file = "FullDash13_10test.csv", na="", row.names = FALSE)
 
 
-# Bind extra dummy-data (with multiple institutions)
-FullDash9altA <- FullDash9csv[c(2101:14600,15001:20000),]
-FullDash9altA$DarInstitutionCode <- "Mars"
-
-FullDash9altB <- FullDash9csv[c(701:1300,10001:80000),]
-FullDash9altB$DarInstitutionCode <- "Venus"
-
-FullDash9altC <- FullDash9csv[c(61401:92400,2450001:2550000),]
-FullDash9altC$DarInstitutionCode <- "Pluto"
-
-FullDash9alt <- rbind(FullDash9csv, FullDash9altA, FullDash9altB, FullDash9altC)
-FullDash9alt <- unique(FullDash9alt)
-FullD9a_check1 <- dplyr::count(FullDash9alt, DarInstitutionCode, RecordType, irn)
-FullD9a_check2 <- FullD9a_check1[which(FullD9a_check1$n>1),]
-
-#View(FullDash9csv[which(is.na(FullDash9csv$DarInstitutionCode)==T),])
-if (NROW(FullDash9alt)>0 & NROW(FullD9a_check2)==0) {
-  write.csv(FullDash9alt, file = "FullDash13alt.csv", na="", row.names = F)
-} else {
-  print ("Error - Check for duplicate records; FullDash13alt.csv not exported")
-}
+# # Bind extra dummy-data (with multiple institutions)
+# FullDash9altA <- FullDash9csv[c(2101:14600,15001:20000),]
+# FullDash9altA$DarInstitutionCode <- "Mars"
+# 
+# FullDash9altB <- FullDash9csv[c(701:1300,10001:80000),]
+# FullDash9altB$DarInstitutionCode <- "Venus"
+# 
+# FullDash9altC <- FullDash9csv[c(61401:92400,2450001:2550000),]
+# FullDash9altC$DarInstitutionCode <- "Pluto"
+# 
+# FullDash9alt <- rbind(FullDash9csv, FullDash9altA, FullDash9altB, FullDash9altC)
+# FullDash9alt <- unique(FullDash9alt)
+# FullD9a_check1 <- dplyr::count(FullDash9alt, DarInstitutionCode, RecordType, irn)
+# FullD9a_check2 <- FullD9a_check1[which(FullD9a_check1$n>1),]
+# 
+# #View(FullDash9csv[which(is.na(FullDash9csv$DarInstitutionCode)==T),])
+# if (NROW(FullDash9alt)>0 & NROW(FullD9a_check2)==0) {
+#   write.csv(FullDash9alt, file = "FullDash13alt.csv", na="", row.names = F)
+# } else {
+#   print ("Error - Check for duplicate records; FullDash13alt.csv not exported")
+# }
 
 
 # Export sample dataset CSV ####

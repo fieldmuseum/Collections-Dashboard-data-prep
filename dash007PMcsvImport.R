@@ -1,50 +1,50 @@
 ## collections-dashboard-prep
-#  Prep Penn Museum catalogue data
+#  Prep PM Museum catalogue data
 #
-# 1) Retrieve latest Penn Museum CSV dataset for "All" collections from:
-#       https://www.penn.museum/collections/objects/data.php
+# 1) Retrieve latest PM Museum CSV dataset for "All" collections from:
+#       https://www.PM.museum/collections/objects/data.php
 #
 # 2) Move zipped CSV to "/data01raw" folder within this project directory.
 # 3) Unzip to a folder labelled "PM[YYYYMMDD]" -- e.g., "PM20180121"
-#           NOTE - Check that Penn's CSV-naming convention matches "all-YYYYMMDD.csv"
+#           NOTE - Check that PM's CSV-naming convention matches "all-YYYYMMDD.csv"
 #
 # 3) Run this script  
 #       - NOTE: May need to re-set working directory to folder containing PM csv's
 #         (see lines 23 & 24)
 
-print(paste(date(), "-- Starting Penn Museum data import -- dash007PMcsvImport.R"))
+print(paste(date(), "-- Starting PM data import -- dash007PMcsvImport.R"))
 
 
 # point to the directory containg the set of "Group" csv's from EMu
 setwd(paste0(origdir,"/data01raw/PM20180121/"))
 
-PennList = list.files(pattern="all.*.csv$")
-CatPenn01 <- do.call(rbind, lapply(PennList, read.csv, stringsAsFactors = F))
+PMList = list.files(pattern="all.*.csv$")
+CatPM01 <- do.call(rbind, lapply(PMList, read.csv, stringsAsFactors = F))
 
 setwd(paste0(origdir,"/data01raw/emuCat"))  # up to /collprep/data01raw/
 
-colnames(CatPenn01)[1] <- "irn"
+colnames(CatPM01)[1] <- "irn"
 
-CatPenn02 <- CatPenn01[order(CatPenn01$irn),]
-CatPenn02 <- unique(CatPenn02)
-rm(CatPenn01)
+CatPM02 <- CatPM01[order(CatPM01$irn),]
+CatPM02 <- unique(CatPM02)
+rm(CatPM01)
 
 # Remove duplicate irn's
-CatIRNcount <- NROW(levels(as.factor(CatPenn02$irn)))
+CatIRNcount <- NROW(levels(as.factor(CatPM02$irn)))
 
-CatPenn02$IRNseq <- sequence(rle(as.character(CatPenn02$irn))$lengths)
+CatPM02$IRNseq <- sequence(rle(as.character(CatPM02$irn))$lengths)
 
-#CatPenn03 <- CatPenn02[which(nchar(as.character(CatPenn02$DarGlobalUniqueIdentifier)) > 3 & CatPenn02$IRNseq == 1),]
-CatPenn03 <- CatPenn02[which(CatPenn02$IRNseq == 1),]
-CatCheck <- CatPenn02[which(CatPenn02$IRNseq > 1),]
+#CatPM03 <- CatPM02[which(nchar(as.character(CatPM02$DarGlobalUniqueIdentifier)) > 3 & CatPM02$IRNseq == 1),]
+CatPM03 <- CatPM02[which(CatPM02$IRNseq == 1),]
+CatCheck <- CatPM02[which(CatPM02$IRNseq > 1),]
 
-CatPenn03 <- dplyr::select(CatPenn03, -IRNseq)
+CatPM03 <- dplyr::select(CatPM03, -IRNseq)
 
-CatPenn04 <- data.frame(
-  "Group1_key" = CatPenn03$irn,
+CatPM04 <- data.frame(
+  "Group1_key" = paste0("PM",CatPM03$irn),
   "ecatalogue_key" = "",
-  "irn" = paste0("PM",CatPenn03$irn),
-  "DarGlobalUniqueIdentifier" = CatPenn03$url,
+  "irn" = CatPM03$irn,
+  "DarGlobalUniqueIdentifier" = CatPM03$url,
   "AdmDateInserted" = "",
   "AdmDateModified" = "",
   "DarImageURL" = "",
@@ -52,45 +52,63 @@ CatPenn04 <- data.frame(
   "DarBasisOfRecord" = "Artefact",
   "DarLatitude" = "",
   "DarLongitude" = "",
-  "DarCountry" = CatPenn03$provenience,
-  "DarContinent" = CatPenn03$curatorial_section,
-  "DarContinentOcean" = CatPenn03$culture_area,
+  "DarCountry" = CatPM03$provenience,
+  "DarContinent" = CatPM03$curatorial_section,
+  "DarContinentOcean" = CatPM03$culture_area,
   "DarWaterBody" = "",
   "DarCollectionCode" = "Anthropology",
   "DarEarliestAge" = "",
   "DarEarliestEon" = "",
   "DarEarliestEpoch" = "",
   "DarEarliestEra" = "",
-  "DarEarliestPeriod" = CatPenn03$date_made_early,
-  "AttPeriod_tab" = CatPenn03$period,
-  "DesEthnicGroupSubgroup_tab" = CatPenn03$culture,
-  "DesMaterials_tab" = CatPenn03$material,
+  "DarEarliestPeriod" = CatPM03$date_made_early,
+  "AttPeriod_tab" = CatPM03$period,
+  "DesEthnicGroupSubgroup_tab" = CatPM03$culture,
+  "DesMaterials_tab" = CatPM03$material,
   "DarOrder" = "",
   "DarScientificName" = "",
   "ClaRank" = "",
   "ComName_tab" = "",
-  "DarRelatedInformation" = paste(CatPenn03$native_name, 
-                                  CatPenn03$description,
-                                  CatPenn03$technique,
-                                  CatPenn03$iconography,
+  "DarRelatedInformation" = paste(CatPM03$native_name, 
+                                  CatPM03$description,
+                                  CatPM03$technique,
+                                  CatPM03$iconography,
                                   sep = " | "),
-  "CatProject_tab" = paste(CatPenn03$accession_credit_line,
-                           CatPenn03$creator,
+  "CatProject_tab" = paste(CatPM03$accession_credit_line,
+                           CatPM03$creator,
                            sep = " | "),
   "DarYearCollected" = "",
   "DarMonthCollected" = "",
-  "EcbNameOfObject" = CatPenn03$object_name,
+  "EcbNameOfObject" = CatPM03$object_name,
   "CatLegalStatus" = "",
   "CatDepartment" = "",
-  "DarCatalogNumber" = CatPenn03$object_number,
+  "DarCatalogNumber" = CatPM03$object_number,
   "DarCollector" = "",
   "MulHasMultiMedia" = "",
-  "DarStateProvince" = CatPenn03$provenience,
+  "DarStateProvince" = CatPM03$provenience,
   "DarInstitutionCode" = "PM",
   stringsAsFactors = F
 )
 
+
+# # screen duplicate GUIDs ####
+# PMcheck <- dplyr::count(CatPM04, DarGlobalUniqueIdentifier)
+# PMcheckGUID <- PMcheck[PMcheck$n>1,]
+# PMcheckFull <- CatPM04[which(CatPM04$DarGlobalUniqueIdentifier %in% PMcheckGUID$DarGlobalUniqueIdentifier),]
+# 
+# if(NROW(PMcheckGUID)>0) {
+#   print(paste("Check 'PMcheck' CSVs for these records: ",
+#               NROW(PMcheckGUID), "duplicate GUIDs in ", 
+#               NROW(PMcheckFull), "PM records"))
+#   write.csv(PMcheckFull,"PMcheck.csv", row.names = F, na="")
+# } else {
+#     print(paste("No duplicate PM GUIDs; all clear!"))
+#   }
+# 
+# CatPM05 <- CatPM04[!(CatPM04$DarGlobalUniqueIdentifier %in% PMcheckGUID$DarGlobalUniqueIdentifier),]
+
+
 # write the lumped/full/single CSV back out
-write.csv(CatPenn04, file="GroupPenn.csv", row.names = F, na="")
+write.csv(CatPM04, file="GroupPM.csv", row.names = F, na="")
 
 setwd(origdir)  # up to /collprep/

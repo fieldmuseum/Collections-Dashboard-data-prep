@@ -55,9 +55,10 @@ if (exists("DWC2_Back")==T) {
 
 # Fix for OI & PM ####
 CatDash3$MulHasMultiMedia <- gsub("Y","1",CatDash3$MulHasMultiMedia)
+CatDash3$MulHasMultiMedia[which(nchar(CatDash3$DarImageURL)>1)] <- "1"
 CatDash3$MulHasMultiMedia <- gsub("N","0",CatDash3$MulHasMultiMedia)
 CatDash3$MulHasMultiMedia[which(is.na(CatDash3$MulHasMultiMedia)==T)] <- "0"
-CatDash3$DarImageURL <- as.integer(CatDash3$MulHasMultiMedia)
+# CatDash3$DarImageURL <- as.integer(CatDash3$MulHasMultiMedia)  # need this?
 
 
 # Add/Adjust columns for Quality calculation
@@ -78,7 +79,7 @@ order <- c("Order","Suborder","Infraorder","Superfamily")
 class <- c("Class","Subclass","Superorder")
 phylum <- c("Phylum","Subphylum","Division")
 
-CatDash3$ClaRank <- simpleCap(CatDash3$ClaRank)
+CatDash3$ClaRank <- sapply(CatDash3$ClaRank, simpleCap)
 
 CatDash3$TaxIDRank <- ""
 CatDash3$TaxIDRank[which(CatDash3$ClaRank %in% species)] <- "Species"
@@ -118,6 +119,8 @@ AccDash2 <- data.frame("irn" = AccDash1$irn,
                                                            "accession-irn",
                                                            AccDash1$irn,
                                                            sep="-"),
+                       # ADD AdmDateInserted + Modified
+                       "DarImageURL" = "",
                        "DarCountry" = AccDash1$LocCountry_tab,
                        "DarContinent" = AccDash1$LocContinent_tab,
                        "DarWaterBody" = AccDash1$LocOcean_tab,
@@ -132,6 +135,7 @@ AccDash2 <- data.frame("irn" = AccDash1$irn,
                        "AccLocality" = AccDash1$AccLocality,
                        "AccGeography" = AccDash1$AccGeography,
                        "AccCatalogueNo" = AccDash1$AccCatalogueNo,
+                       "MulHasMultiMedia" = "0",
                        "RecordType" = "Accession",
                        "AccTotal" = AccDash1$AccTotal,
                        "Backlog" = AccDash1$backlog,
@@ -145,15 +149,40 @@ print(paste("... ", substr(date(), 12, 19), "- binding catalogue & accession rec
 # bind catalog and backlog records
 FullDash <- plyr::rbind.fill(CatDash3, AccDash2)
 
-
 print(paste("... ",substr(date(), 12, 19), "- cleaning up full data table..."))
 
 # cleanup import
 rm(CatDash2, AccDash1)
-FullDash2 <- unique(FullDash)
+FullDash1 <- unique(FullDash)
 
-# check duplicates
-FullDash0check <- dplyr::count(FullDash, DarInstitutionCode, DarGlobalUniqueIdentifier)
+
+# check duplicate GUIDs [first instance is kept; subsequent are removed]] ####
+# keep first instance:
+FullGUIDcount <- dplyr::count(FullDash, DarGlobalUniqueIdentifier)
+
+FullDash1 <- FullDash1[order(FullDash1$DarGlobalUniqueIdentifier, FullDash1$DarCatalogNumber),]
+FullDash1$GUIDseq <- sequence(rle(as.character(FullDash1$DarGlobalUniqueIdentifier))$lengths)
+
+FullDash2 <- FullDash1[which(FullDash1$GUIDseq == 1),]
+FullDash2 <- dplyr::select(FullDash2, -GUIDseq)
+
+# remove subsequent duplicate GUIDs ####
+FullCheck <- dplyr::count(FullDash1, DarGlobalUniqueIdentifier)
+FullCheckGUID <- FullCheck[FullCheck$n>1,]
+FullCheckAll <- FullDash1[which(FullDash1$DarGlobalUniqueIdentifier %in% FullCheckGUID$DarGlobalUniqueIdentifier),]
+
+if(NROW(FullCheckGUID)>0) {
+  print(paste("Check 'GUIDcheck' CSVs for: ",
+              NROW(FullCheckGUID), "duplicate GUIDs in ",
+              NROW(FullCheckAll), "records"))
+  setwd(paste0(origdir,"/data03check"))
+  write.csv(FullCheckAll,"GUIDcheck_dash020.csv", row.names = F, na="")
+} else {
+    print(paste("No duplicate GUIDs; all clear!"))  # if only...
+  }
+
+# FullDash2alt <- FullDash1[!(FullDash1$DarGlobalUniqueIdentifier %in% FullCheckGUID$DarGlobalUniqueIdentifier),] # if need to exclude all duplicates
+
 
 # Qualilty - rank records ####
 FullDash2$Quality <- 1
@@ -168,14 +197,14 @@ FullDash2$Backlog[which(FullDash2$Quality==1 & FullDash2$RecordType=="Accession"
 FullDash2$Backlog[which(FullDash2$RecordType=="Catalog")] <- 0
 
 # Catalog Partial data measure -- higher = better
-FullDash2$DarCountry[which(FullDash2$DarCountry=="NA")] = NA
-FullDash2$DarScientificName[which(FullDash2$DarScientificName=="NA")] = NA
-FullDash2$DarMonthCollected[which(FullDash2$DarMonthCollected=="NA")] = NA
-FullDash2$DarCatalogNumber[which(FullDash2$DarCatalogNumber=="NA")] = NA
-FullDash2$DarCollector[which(FullDash2$DarCollector=="NA")] = NA
-FullDash2$DarImageURL[which(FullDash2$DarImageURL=="NA")] = NA
-FullDash2$DarLatitude[which(FullDash2$DarLatitude=="NA")] = NA
-FullDash2$DarLongitude[which(FullDash2$DarLongitude=="NA")] = NA
+FullDash2$DarCountry[which(FullDash2$DarCountry=="NA" | FullDash2$DarCountry=="")] = NA
+FullDash2$DarScientificName[which(FullDash2$DarScientificName=="NA" | FullDash2$DarScientificName=="")] = NA
+FullDash2$DarMonthCollected[which(FullDash2$DarMonthCollected=="NA" | FullDash2$DarMonthCollected=="")] = NA
+FullDash2$DarCatalogNumber[which(FullDash2$DarCatalogNumber=="NA" | FullDash2$DarCatalogNumber=="")] = NA
+FullDash2$DarCollector[which(FullDash2$DarCollector=="NA" | FullDash2$DarCollector=="")] = NA
+FullDash2$DarImageURL[which(FullDash2$DarImageURL=="NA" | FullDash2$DarImageURL=="")] = NA
+FullDash2$DarLatitude[which(FullDash2$DarLatitude=="NA" | FullDash2$DarLatitude=="")] = NA
+FullDash2$DarLongitude[which(FullDash2$DarLongitude=="NA" | FullDash2$DarLongitude=="")] = NA
 
 # Calculate number of Darwin Core fields filled
 FullDash2$CatQual <- 5 - (is.na(FullDash2$DarCountry)  # need to update with DarStateProvince
@@ -186,8 +215,8 @@ FullDash2$CatQual <- 5 - (is.na(FullDash2$DarCountry)  # need to update with Dar
 
 FullDash2$Quality[which(FullDash2$RecordType=="Catalog")] <- 6
 FullDash2$Quality[which(FullDash2$RecordType=="Catalog" & FullDash2$CatQual>0)] <- 7
-FullDash2$Quality[which(FullDash2$RecordType=="Catalog" & FullDash2$CatQual>2 & (is.na(FullDash2$DarLatitude)+(1-FullDash2$DarImageURL))<2)] <- 8
-FullDash2$Quality[which(FullDash2$RecordType=="Catalog" & FullDash2$CatQual==5 & (is.na(FullDash2$DarLatitude)+(1-FullDash2$DarImageURL))==0)] <- 9
+FullDash2$Quality[which(FullDash2$RecordType=="Catalog" & FullDash2$CatQual>2 & (is.na(FullDash2$DarLatitude)+(is.na(FullDash2$DarImageURL)))<2)] <- 8
+FullDash2$Quality[which(FullDash2$RecordType=="Catalog" & FullDash2$CatQual==5 & (is.na(FullDash2$DarLatitude)+(is.na(FullDash2$DarImageURL)))==0)] <- 9
 
 
 # Quality Summary Count Export ####
