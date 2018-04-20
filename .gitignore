@@ -8,9 +8,10 @@
 *.csv
 *.Rproj
 
-/data01raw/
-/data02processed/
-/data03check/
-/output/
-/outputSample
-/supplementary
+data01raw/
+data02processed/
+data03check/
+output/
+outputSample/
+supplementary/
+test/
