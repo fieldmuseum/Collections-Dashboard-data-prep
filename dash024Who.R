@@ -10,7 +10,7 @@ setwd(paste0(origdir,"/data01raw"))
 #  Who ####
 #  1-Who: Clean "Who" fields
 
-WhoDashBU <- FullDash3[,c("irn", "RecordType","DarInstitutionCode", 
+WhoDashBU <- FullDash3[,c("DarGlobalUniqueIdentifier", 
                           "DesEthnicGroupSubgroup_tab", 
                           "AccDescription", "AccDescription2", # might need to cut these?
                           "EcbNameOfObject")]
@@ -20,11 +20,11 @@ WhoDash <- WhoDashBU
 print(paste("... ",substr(date(), 12, 19), "- cleaning WHO data..."))
 
 date() 
-WhoDash[,3:NCOL(WhoDash)] <- sapply(WhoDash[,3:NCOL(WhoDash)], function (x) gsub("^NA$|^'| a |[/()?]|\\[\\]|probably", " ", x, ignore.case = T))
-WhoDash[,3:NCOL(WhoDash)] <- sapply(WhoDash[,3:NCOL(WhoDash)], function (x) gsub(",| - |;", " | ", x))
-WhoDash[,3:NCOL(WhoDash)] <- sapply(WhoDash[,3:NCOL(WhoDash)], function (x) gsub("\\s+", " ", x))
-WhoDash[,3:NCOL(WhoDash)] <- sapply(WhoDash[,3:NCOL(WhoDash)], function (x) gsub("^\\s+|\\s+$", "", x))
-WhoDash[,3:NCOL(WhoDash)] <- sapply(WhoDash[,3:NCOL(WhoDash)], function (x) gsub("^NA$|^NANA$", "", x, ignore.case = T))
+WhoDash[,2:NCOL(WhoDash)] <- sapply(WhoDash[,2:NCOL(WhoDash)], function (x) gsub("^NA$|^'| a |[/()?]|\\[\\]|probably", " ", x, ignore.case = T))
+WhoDash[,2:NCOL(WhoDash)] <- sapply(WhoDash[,2:NCOL(WhoDash)], function (x) gsub(",| - |;", " | ", x))
+WhoDash[,2:NCOL(WhoDash)] <- sapply(WhoDash[,2:NCOL(WhoDash)], function (x) gsub("\\s+", " ", x))
+WhoDash[,2:NCOL(WhoDash)] <- sapply(WhoDash[,2:NCOL(WhoDash)], function (x) gsub("^\\s+|\\s+$", "", x))
+WhoDash[,2:NCOL(WhoDash)] <- sapply(WhoDash[,2:NCOL(WhoDash)], function (x) gsub("^NA$|^NANA$", "", x, ignore.case = T))
 date()
 
 
@@ -81,31 +81,31 @@ WhoDash <- separate(WhoDash, AccDescription2, c("Acc2Nam1","Acc2Nam2","Acc2Nam3"
 print(paste("... ",substr(date(), 12, 19), "- still cleaning WHO -- next step takes ~50min..."))
 
 date()
-WhoDashExt <- WhoDash[,c("irn","RecordType","DarInstitutionCode",
+WhoDashExt <- WhoDash[,c("DarGlobalUniqueIdentifier",
                           "EcbNam1","EcbNam2","EcbNam3","EcbNam4","EcbNam5","EcbNam6",
                           "Acc1Nam1","Acc1Nam2","Acc1Nam3","Acc1Nam4","Acc1Nam5","Acc1Nam6",
                           "Acc2Nam1","Acc2Nam2","Acc2Nam3","Acc2Nam4","Acc2Nam5","Acc2Nam6")]
 
-WhoDashExt <- unite(WhoDashExt, RecIRNInst, irn:DarInstitutionCode, sep="_")
+#WhoDashExt <- unite(WhoDashExt, RecIRNInst, irn:DarInstitutionCode, sep="_")
 #WhoDashExt <- select(WhoDashExt, -c(irn,RecordType))
 
-WhoDashExt2 <- gather(WhoDashExt, RecIRNInst, "Who", EcbNam1:Acc2Nam6)
+WhoDashExt2 <- gather(WhoDashExt, DarGlobalUniqueIdentifier, "Who", EcbNam1:Acc2Nam6)
 #WhoDashExt2 <- WhoDashExt2[,c(1,3)]
 WhoDashExt2 <- WhoDashExt2[which(nchar(WhoDashExt2$Who)>1),]  # 53,012,686
 
 WhoDashExt2 <- WhoDashExt2[which(WhoDashExt2$Who %in% WhoLUT$WhoLUT),]
 
 WhoDashExt2 <- unique(WhoDashExt2)
-WhoDashExt2 <- WhoDashExt2[order(WhoDashExt2$RecIRNInst),]
+WhoDashExt2 <- WhoDashExt2[order(WhoDashExt2$DarGlobalUniqueIdentifier),]
 
 if(NROW(WhoDashExt2)>0) {
-  WhoDashExt2$WhoSeq <- sequence(rle(as.character(WhoDashExt2$RecIRNInst))$lengths)
-  WhoDashExt2 <- WhoDashExt2[,c("RecIRNInst","WhoSeq","Who")]
+  WhoDashExt2$WhoSeq <- sequence(rle(as.character(WhoDashExt2$DarGlobalUniqueIdentifier))$lengths)
+  WhoDashExt2 <- WhoDashExt2[,c("DarGlobalUniqueIdentifier","WhoSeq","Who")]
   WhoDashExt3 <- tidyr::spread(WhoDashExt2, WhoSeq, Who, sep="_")
   
   date()
   
-  WhoDashExt3 <- separate(WhoDashExt3, RecIRNInst, c("irn","RecordType","DarInstitutionCode"), sep="_")
+  # WhoDashExt3 <- separate(WhoDashExt3, RecIRNInst, c("irn","RecordType","DarInstitutionCode"), sep="_")
   # may need to edit next line if WhoSeq_5 isn't last column
   WhoDashExt3 <- unite(WhoDashExt3, WhoExtra, WhoSeq_1:WhoSeq_5, sep = " | ")
   WhoDashExt3$WhoExtra <- gsub("\\s+NA\\s+|\\s+NA$","",WhoDashExt3$WhoExtra)
@@ -115,8 +115,8 @@ if(NROW(WhoDashExt2)>0) {
   date()
   
   
-  WhoDash2 <- merge(WhoDash, WhoDashExt3, by=c("irn","RecordType","DarInstitutionCode"), all.x=T)
-  WhoDash2 <- WhoDash2[,c("irn","RecordType","DarInstitutionCode","DesEthnicGroupSubgroup_tab","WhoExtra")]
+  WhoDash2 <- merge(WhoDash, WhoDashExt3, by=c("DarGlobalUniqueIdentifier"), all.x=T)
+  WhoDash2 <- WhoDash2[,c("DarGlobalUniqueIdentifier","DesEthnicGroupSubgroup_tab","WhoExtra")]
   WhoDash2$WhoExtra[which(is.na(WhoDash2$WhoExtra)==T)] <- ""
 
   #  3-Concat 'Who' data
@@ -124,9 +124,9 @@ if(NROW(WhoDashExt2)>0) {
 
 } else {
   
-  WhoDash2 <- WhoDash[,c("irn","RecordType","DarInstitutionCode","DarInstitutionCode","DesEthnicGroupSubgroup_tab")]
+  WhoDash2 <- WhoDash[,c("DarGlobalUniqueIdentifier","DesEthnicGroupSubgroup_tab")]
   #  alt-3-Concat 'Who' data ####
-  colnames(WhoDash2)[4] <- "Who"
+  colnames(WhoDash2)[2] <- "Who"
   
 }  
 
@@ -141,7 +141,7 @@ WhoDash2$Who <- gsub("^\\s+\\|\\s+$", "", WhoDash2$Who)
 WhoDash2$Who <- gsub("^NA$|^NA\\s+\\|\\s+|\\s+\\|\\s+NA$", "", WhoDash2$Who)
 
 #  4-Merge WHERE+WHAT+WHEN-WHO ####
-FullDash7csv <- merge(FullDash6csv, WhoDash2, by=c("irn","RecordType","DarInstitutionCode"), all.x=T)
+FullDash7csv <- merge(FullDash6csv, WhoDash2, by=c("DarGlobalUniqueIdentifier"), all.x=T)
 
 Log024Who <- warnings()
 

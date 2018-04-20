@@ -24,12 +24,12 @@ FullDash5csv <- merge(FullDash4csv, collURL, by=c("DarCollectionCode", "DarInsti
 #  WhenAge LUTs ####
 #  1-When: Clean "When" fields
 
-WhenDash <- FullDash3[,c("irn", "RecordType", "DarInstitutionCode", 
+WhenDash <- FullDash3[,c("DarGlobalUniqueIdentifier", "RecordType", "DarInstitutionCode", 
                          "DarEarliestEon", "DarEarliestEra", "DarEarliestPeriod",
                          "DarEarliestEpoch", "DarEarliestAge", "AttPeriod_tab"
                          # "DarYearCollected"
                          # "AccDescription", "AccDescription2"
-)]
+                         )]
 
 
 print(paste("... ",substr(date(), 12, 19), "- cleaning WHEN data fields..."))
@@ -169,8 +169,8 @@ WhenDash2$WhenAgeTo <- WhenDash2$DateTo.x
 
 #WhenDash3 <- unite(WhenDash2, "WhenAge", DarEarliestEon:AccDescription2, sep=" | ", remove=TRUE)
 WhenDash3 <- unite(WhenDash2, "WhenAge2", DarEarliestEon:AttPeriod_tab, sep=" | ", remove=TRUE)
-WhenDash3 <- WhenDash3[,c("irn", "RecordType","DarInstitutionCode", "WhenAge2", "WhenAgeFrom", "WhenAgeTo")]
-colnames(WhenDash3)[4] <- "WhenAge"
+WhenDash3 <- WhenDash3[,c("DarGlobalUniqueIdentifier", "WhenAge2", "WhenAgeFrom", "WhenAgeTo")]
+colnames(WhenDash3)[2] <- "WhenAge"
 
 #WhenDash3$WhenAge <- gsub("NA \\| ", "", WhenDash3$WhenAge)
 #WhenDash3$WhenAge <- gsub(" \\| NA", "", WhenDash3$WhenAge)
@@ -197,13 +197,13 @@ WhenDash3 <- dplyr::select(WhenDash3, -c(WhenAgeMin,WhenAgeMax))
 # 1 - Merge Department column
 setwd(paste0(origdir, "/supplementary"))
 Depts <- read.csv(file="Departments.csv", stringsAsFactors = F)
-Depts2 <- CatDash3[,c("irn","RecordType","DarInstitutionCode","DarCollectionCode","DarYearCollected")]
+Depts2 <- CatDash3[,c("DarGlobalUniqueIdentifier","DarCollectionCode","DarYearCollected")]
 Depts3 <- merge(Depts2, Depts, by=c("DarCollectionCode"), all.x=T)
-Depts3 <- Depts3[,c("irn","RecordType","DarInstitutionCode","DarYearCollected","Department")]
+Depts3 <- Depts3[,c("DarGlobalUniqueIdentifier","DarYearCollected","Department")]
 
 setwd(paste0(origdir,"/data01raw"))
 
-WhenDash4 <- merge(WhenDash3, Depts3, by=c("irn","RecordType","DarInstitutionCode"), all.x=T)
+WhenDash4 <- merge(WhenDash3, Depts3, by=c("DarGlobalUniqueIdentifier"), all.x=T)
 rm(Depts, Depts2, Depts3)
 
 #WhenDash4$WhenAge[which(WhenDash4$Department=="Botany" | WhenDash4$Department=="Zoology")] <- WhenDash4$DarYearCollected[which(WhenDash4$Department=="Botany" | WhenDash4$Department=="Zoology")]
@@ -275,7 +275,7 @@ WhenAgeLUT <- WhenAgeLUT[order(WhenAgeLUT$WhenLUT),]
 
 
 #  3-When: merge WHERE+WHAT+WHEN ####
-FullDash6csv <- merge(FullDash5csv, WhenDash5, by=c("irn","RecordType","DarInstitutionCode"), all.x=T)
+FullDash6csv <- merge(FullDash5csv, WhenDash5, by=c("DarGlobalUniqueIdentifier"), all.x=T)
 
 Log023When <- warnings()
 

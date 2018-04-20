@@ -210,18 +210,17 @@ CatOI03 <- data.frame(
   "DarContinent" = "Africa",  # hard-coded here for Egypt test-dataset
   "DarContinentOcean" = "",
   "DarWaterBody" = "",
-  "DarCollectionCode" = "Anthropology",
+  "DarCollectionCode" = CatOI02$ColCollection,
   "DarEarliestAge" = "",
   "DarEarliestEon" = "",
   "DarEarliestEpoch" = "",
   "DarEarliestEra" = "",
   "DarEarliestPeriod" = CatOI02$DatDateMade,
-  "AttPeriod_tab" = paste(CatOI02$DatDynasty,  # better way to map/parse these?
-                          CatOI02$DatKingRuler,
-                          CatOI02$DatPeriod,
-                          sep = " | "),
-  "DesEthnicGroupSubgroup_tab" = paste(CatOI02$ColCollection,  # better way to map/parse these?
-                                       CatOI02$ProCulturalAffiliation,
+  "AttPeriod_tab" = CatOI02$DatPeriod,
+  # map these separately: paste(CatOI02$DatDynasty,  # map these to new field/s called "Dynasty"
+  #                             CatOI02$DatKingRuler,  
+  #                             sep = " | "),
+  "DesEthnicGroupSubgroup_tab" = paste(CatOI02$ProCulturalAffiliation,
                                        CatOI02$ProAlternateNames,
                                        sep = " | "),
   "DesMaterials_tab" = CatOI02$ProMaterials,
@@ -229,7 +228,7 @@ CatOI03 <- data.frame(
   "DarScientificName" = "",
   "ClaRank" = "",
   "ComName_tab" = "",
-  "DarRelatedInformation" = paste(CatOI02$CatDescription,  # better way to map/parse these? 
+  "DarRelatedInformation" = paste(CatOI02$CatDescription,  # DarRelatedInfo = DesKDescription where DesKType_tab = "Basic Description" (b/c for FMNH it's safe to publish on web)
                                   CatOI02$InsDialect,
                                   CatOI02$InsScript,
                                   sep = " | "),
@@ -238,7 +237,7 @@ CatOI03 <- data.frame(
   "DarMonthCollected" = "",
   "EcbNameOfObject" = CatOI02$ColClassification,
   "CatLegalStatus" = "",
-  "CatDepartment" = CatOI02$SecDepartment,
+  "CatDepartment" = CatOI02$SecDepartment, # better option?
   "DarCatalogNumber" = paste(CatOI02$ColPrefix,
                              CatOI02$ColRegistrationNumber,
                              CatOI02$ColSuffix),

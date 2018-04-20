@@ -15,15 +15,15 @@ rm(Depts)
 
 
 # Merge DarIndividualCount to count # catalogged items in results
-DarIndivCount <- CatDash3[,c("irn","RecordType", "DarInstitutionCode", "DarIndividualCount")]
-FullDash8csv <- merge(FullDash8csv, DarIndivCount, by=c("irn","RecordType","DarInstitutionCode"), all.x=T)
+DarIndivCount <- CatDash3[,c("DarGlobalUniqueIdentifier", "DarIndividualCount")]
+FullDash8csv <- merge(FullDash8csv, DarIndivCount, by=c("DarGlobalUniqueIdentifier"), all.x=T)
 FullDash8csv$DarIndividualCount[which(FullDash8csv$RecordType=="Catalog" & is.na(FullDash8csv$DarIndividualCount)==T)] <- 1
 FullDash8csv$DarIndividualCount[which(FullDash8csv$RecordType=="Accession")] <- 0
 rm(DarIndivCount)
 
 
 # Setup final data frame for export
-FullDash9csv <- FullDash8csv[,c("irn","DarLatitude","DarLongitude","Where",
+FullDash9csv <- FullDash8csv[,c("DarGlobalUniqueIdentifier","DarLatitude","DarLongitude","Where",
                                 "Quality","RecordType","Backlog","TaxIDRank",
                                 "What","DarCollectionCode", "HasMM", "URL",
                                 "WhenAge", "WhenAgeFrom", "WhenAgeTo","DarYearCollected",
@@ -52,6 +52,9 @@ FullDash9csv$Who <- gsub("^NA\\s+\\|\\s+", "", FullDash9csv$Who, ignore.case = F
 FullDash9csv$Who <- gsub("\\s+\\|\\s+NA$|\\s+\\|\\s+NA\\s+|^\\s+\\|\\s+|\\s+\\|\\s+$", "", FullDash9csv$Who, ignore.case = F)
 FullDash9csv$WhenAge <- gsub("^NA$", "", FullDash9csv$WhenAge, ignore.case = F)
 
+FullDash9csv[,c("What","WhenAge", "Where", "Who", "Bioregion")] <- sapply(FullDash9csv[,c("What","WhenAge", "Where", "Who", "Bioregion")],
+                                                                          function (x) gsub("^\\s*(\\|\\s*)*|(\\s*\\|)*\\s*$", "", x))
+
 FullDash9csv$WhenAge[which(is.na(FullDash9csv$WhenAge)==T)] <- ""
 FullDash9csv$Who[which(is.na(FullDash9csv$Who)==T)] <- ""
 FullDash9csv$Where[which(is.na(FullDash9csv$Where)==T)] <- ""
@@ -79,7 +82,8 @@ ScrubFull <- rbind(ScrubCat[,c("irn","irnScrub")], ScrubAcc[,c("irn","irnScrub")
 # merge
 AccBacklogSamp <- merge(AccBacklogSamp1, ScrubAcc, by="irn", all.x=T)
 CatDash03Samp <- merge(CatDash03Samp1, ScrubCat, by="irn", all.x=T)
-FullDashSample <- merge(FullDashSample1, ScrubFull, by="irn", all.x=T)
+# # FIX THIS
+# FullDashSample <- merge(FullDashSample1, ScrubFull, by="DarGlobalUniqueIdentifier", all.x=T)
 
 # scrub id #s
 AccBacklogSamp$irn <- AccBacklogSamp$irnScrub
@@ -96,10 +100,11 @@ CatDash03Samp$DarImageURL <- gsub("[[:digit:]]","5",CatDash03Samp$DarImageURL)
 CatDash03Samp$DarLatitude <- as.integer(CatDash03Samp$DarLatitude)
 CatDash03Samp$DarLongitude <- as.integer(CatDash03Samp$DarLongitude)
 
-FullDashSample$irn <- FullDashSample$irnScrub
-FullDashSample <- select(FullDashSample, -irnScrub)
-FullDashSample$DarLatitude <- as.integer(FullDashSample$DarLatitude)
-FullDashSample$DarLongitude <- as.integer(FullDashSample$DarLongitude)
+# # Need to fix this
+# FullDashSample$irn <- FullDashSample$irnScrub
+# FullDashSample <- select(FullDashSample, -irnScrub)
+# FullDashSample$DarLatitude <- as.integer(FullDashSample$DarLatitude)
+# FullDashSample$DarLongitude <- as.integer(FullDashSample$DarLongitude)
 
 
 print(paste(date(), "-- ...finished sample-data prep; starting export of final dataset & LUTs."))
@@ -110,10 +115,11 @@ setwd(paste0(origdir,"/output"))
 
 # TEMP FIX # # # #
 FullDash9csv$DarInstitutionCode[which(is.na(FullDash9csv$DarInstitutionCode)==T)] <- "FMNH" 
+FullDash9csv$DarInstitutionCode[which(FullDash9csv$DarInstitutionCode=="FALSE" | FullDash9csv$DarInstitutionCode=="F")] <- "FMNH"
 
 # Check for duplicates
 FullDash9csv <- unique(FullDash9csv)
-FullD9_check1 <- dplyr::count(FullDash9csv, DarInstitutionCode, RecordType, irn)
+FullD9_check1 <- dplyr::count(FullDash9csv, DarGlobalUniqueIdentifier)
 FullD9_check2 <- FullD9_check1[which(FullD9_check1$n>1),]
 
 if (NROW(FullDash9csv)>0 & NROW(FullD9_check2)==0) {
@@ -122,6 +128,9 @@ if (NROW(FullDash9csv)>0 & NROW(FullD9_check2)==0) {
   print("Error - Check for duplicate records; FullDash13.csv not exported")
 }
 
+# Setup / Export sample records:
+FullDash9csvSAMP <- FullDash9csv[c(700:800,28700:28900,49400:49450,81150:81200,158500:158600,1527000:1527100,1567200:1567300,3000000:3000100,3628000:3628200),]
+write.csv(FullDash9csvSAMP, file = "FullDash13_samp.csv", na="", row.names = FALSE)
 
 # Dump test dataset for Cultural Collections Dashboard
 # - TO DO: 

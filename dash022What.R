@@ -30,12 +30,11 @@ ItisComName4$ComNam2 <- gsub("\\s+", " ", ItisComName4$ComNam2)
 ItisComName4$ComNam2 <- sapply(ItisComName4$ComNam2, simpleCap)
 
 #WhatDash4 <- FullDash4[,c("irn", "RecordType", "What", "DarOrder")]
-WhatDash4 <- FullDash3[,c("irn", "RecordType","DarInstitutionCode", 
+WhatDash4 <- FullDash3[,c("DarGlobalUniqueIdentifier", # "RecordType","DarInstitutionCode", 
                           "DarScientificName", "DarOrder",
                           "DarCollectionCode", "ComName_tab", "DesMaterials_tab",
                           "EcbNameOfObject",
-                          "AccDescription","AccDescription2", "DarRelatedInformation"
-)]
+                          "AccDescription","AccDescription2", "DarRelatedInformation")]
 
 WhatDash4 <- merge(WhatDash4, ItisComName4, by="DarOrder", all.x=T)
 WhatDash4 <- WhatDash4[,c(2,3,1,4:NCOL(WhatDash4))]
@@ -275,9 +274,12 @@ WhatDash5$What <- gsub("\\| and \\|", "|", WhatDash5$What, ignore.case = T)
 WhatDash5$What <- gsub("\\s+", " ", WhatDash5$What)
 WhatDash5$What <- gsub("(\\|\\s+)+","| ",WhatDash5$What)
 
+WhatDash5 <- WhatDash5[,c("DarGlobalUniqueIdentifier","What","EcbNameOfObject",
+                          "AccDescription","AccDescription2", "DarRelatedInformation")]
 
-FullDash4csv <- merge(FullDash3csv, WhatDash5, by=c("irn","RecordType","DarInstitutionCode"), all.x=T)
-FullDash4csv <- FullDash4csv[,c("irn","DarLatitude","DarLongitude","Where",
+FullDash4csv <- merge(FullDash3csv, WhatDash5, by=c("DarGlobalUniqueIdentifier"), all.x=T)
+
+FullDash4csv <- FullDash4csv[,c("DarGlobalUniqueIdentifier","DarLatitude","DarLongitude","Where",
                                 "Quality","RecordType","Backlog","TaxIDRank",
                                 "What","DarCollectionCode","HasMM",
                                 "DarInstitutionCode")]

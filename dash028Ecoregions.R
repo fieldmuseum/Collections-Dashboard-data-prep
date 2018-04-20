@@ -4,16 +4,16 @@ print(paste(date(), "-- ...finished setting up Visitor data.   Starting dash028E
 
 
 # Add separate columns for DarCountry & DarContinentOcean
-DarCtryContOcean <- FullDash2[,c("irn","RecordType", "DarInstitutionCode",
+DarCtryContOcean <- FullDash2[,c("DarGlobalUniqueIdentifier",
                                  "cleanDarCountry","cleanDarContinentOcean",
                                  "cleanAccGeography", "cleanAccLocality"
                                  )]
 
-DarCtryContOcean[,3:NCOL(DarCtryContOcean)] <- sapply(DarCtryContOcean[,3:NCOL(DarCtryContOcean)],
+DarCtryContOcean[,2:NCOL(DarCtryContOcean)] <- sapply(DarCtryContOcean[,2:NCOL(DarCtryContOcean)],
                                                       function(x) gsub("(NA)+","",x))
 
 # Only using first value from pipe-delimited Accession Geography fields (to simplify merge)
-DarCtryContOcean[,5:NCOL(DarCtryContOcean)] <- sapply(DarCtryContOcean[,5:NCOL(DarCtryContOcean)],
+DarCtryContOcean[,4:NCOL(DarCtryContOcean)] <- sapply(DarCtryContOcean[,4:NCOL(DarCtryContOcean)],
                                                       function(x) gsub("\\s+\\|.*","",x))
 
 
@@ -44,7 +44,7 @@ Ecoregions$CountryOcean <- tolower(Ecoregions$CountryOcean)
 DarCtryContOcean$CountryOcean <- tolower(DarCtryContOcean$CountryOcean)
 
 DarCtryContOcean <- merge(DarCtryContOcean, Ecoregions, by=c("CountryOcean"), all.x=T)
-DarCtryContOcean <- DarCtryContOcean[,c("irn","RecordType","DarInstitutionCode","Bioregion")]
+DarCtryContOcean <- DarCtryContOcean[,c("DarGlobalUniqueIdentifier","Bioregion")]
 DarCtryContOcean$Bioregion[which(is.na(DarCtryContOcean$Bioregion)==T)] <- ""
 
 #DarCtryContOcean <- unite(DarCtryContOcean, Bioregion, cleanDarCountry:cleanAccLocality, sep=" | ")
@@ -53,7 +53,7 @@ DarCtryContOcean$Bioregion[which(is.na(DarCtryContOcean$Bioregion)==T)] <- ""
 #DarCtryContOcean$Bioregion <- gsub("^\\s+|\\s+$", "", DarCtryContOcean$Bioregion)
 
 
-FullDash8 <- merge(FullDash7csv, DarCtryContOcean, by=c("irn","RecordType","DarInstitutionCode"), all.x=T)
+FullDash8 <- merge(FullDash7csv, DarCtryContOcean, by=c("DarGlobalUniqueIdentifier"), all.x=T)
 
 Log028Ecoregions <- warnings()
 

@@ -33,19 +33,19 @@ sourceDir <- function(path, trace = TRUE, ...) {
   }
 }
 
-usePackage <- function(p) {
-  newPackages <- p[!(p %in% installed.packages()[, "Package"])]
-  if(length(newPackages))
-    install.packages(newPackages, dependencies = TRUE)
-  cat("Packages successfully loaded:\n")
-  sapply(p, require, character.only = TRUE, quietly = TRUE)
-}
-
-simpleCap <- function(x) {
-  s <- strsplit(tolower(x), " ")[[1]]
-  paste(toupper(substring(s, 1, 1)), substring(s, 2),
-        sep = "", collapse = " ")
-}
+# usePackage <- function(p) {
+#   newPackages <- p[!(p %in% installed.packages()[, "Package"])]
+#   if(length(newPackages))
+#     install.packages(newPackages, dependencies = TRUE)
+#   cat("Packages successfully loaded:\n")
+#   sapply(p, require, character.only = TRUE, quietly = TRUE)
+# }
+# 
+# simpleCap <- function(x) {
+#   s <- strsplit(tolower(x), " ")[[1]]
+#   paste(toupper(substring(s, 1, 1)), substring(s, 2),
+#         sep = "", collapse = " ")
+# }
 
 sourceDir(paste(getwd(),"/functions",sep=""))
 
@@ -53,10 +53,11 @@ usePackage("tidyr")
 usePackage("plyr")
 usePackage("dplyr")
 usePackage("purrr")
+usePackage("stringr")  # may not need
 
 
 # Select which scripts to run
-DarYN <- readline(prompt="Do you need to import a Darwin Core archive? (Y/N) ")
+# DarYN <- readline(prompt="Do you need to import a Darwin Core archive? (Y/N) ")
 AccYN <- readline(prompt="Do you need to import accession (backlog) dataset/s? (Y/N) ")
 
 
@@ -64,7 +65,7 @@ AccYN <- readline(prompt="Do you need to import accession (backlog) dataset/s? (
 if (DarYN=="Y") { source("dash005DarPrep.R") }
 
 # Added OI recordset import 06-feb-2018
-# ( CSV from Foy's shared XLSX report )
+# ( CSV from OI's shared XLSX report )
 source("dash006OIcsvImport.R")
 
 # Added Penn-Museum recordset import 26-jan-2018

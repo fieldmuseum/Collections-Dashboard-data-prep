@@ -52,11 +52,11 @@ CatPM04 <- data.frame(
   "DarBasisOfRecord" = "Artefact",
   "DarLatitude" = "",
   "DarLongitude" = "",
-  "DarCountry" = CatPM03$provenience,
-  "DarContinent" = CatPM03$curatorial_section,
+  "DarCountry" = gsub("\\|", " | ", CatPM03$provenience), # check if Where LUT tries to build countries with this; if so, need to not use
+  "DarContinent" = "",
   "DarContinentOcean" = CatPM03$culture_area,
   "DarWaterBody" = "",
-  "DarCollectionCode" = "Anthropology",
+  "DarCollectionCode" = CatPM03$curatorial_section,
   "DarEarliestAge" = "",
   "DarEarliestEon" = "",
   "DarEarliestEpoch" = "",
@@ -81,11 +81,11 @@ CatPM04 <- data.frame(
   "DarMonthCollected" = "",
   "EcbNameOfObject" = CatPM03$object_name,
   "CatLegalStatus" = "",
-  "CatDepartment" = "",
+  "CatDepartment" = "", # find out what Penn calls it
   "DarCatalogNumber" = CatPM03$object_number,
   "DarCollector" = "",
   "MulHasMultiMedia" = "",
-  "DarStateProvince" = CatPM03$provenience,
+  "DarStateProvince" = "",
   "DarInstitutionCode" = "PM",
   stringsAsFactors = F
 )
