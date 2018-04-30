@@ -128,7 +128,21 @@ if (NROW(FullDash9csv)>0 & NROW(FullD9_check2)==0) {
   print("Error - Check for duplicate records; FullDash13.csv not exported")
 }
 
+
 # Setup / Export sample records:
+Full9sample <- rbind(
+  FullDash9csv[(FullDash9csv$DarInstitutionCode=="PM"),][c(3:6,200:205),], # 8005:8010,99905:9990
+  FullDash9csv[(FullDash9csv$DarInstitutionCode=="PM" & FullDash9csv$WhenAgeFrom>0),][c(5:9),],
+  FullDash9csv[(FullDash9csv$DarInstitutionCode=="OI"),][c(3:6,200:205),],
+  FullDash9csv[(FullDash9csv$DarInstitutionCode=="OI" & FullDash9csv$WhenAgeFrom>0),][c(5:9),],
+  FullDash9csv[(FullDash9csv$DarInstitutionCode=="FMNH" & FullDash9csv$RecordType=="Catalog"),][c(305:312),],
+  FullDash9csv[(FullDash9csv$DarInstitutionCode=="FMNH" & FullDash9csv$RecordType=="Accession"),][c(13692:13696,12610:12613),],
+  FullDash9csv[(FullDash9csv$DarInstitutionCode=="FMNH" & FullDash9csv$DarCollectionCode=="Anthropology"),][c(130:134),],
+  FullDash9csv[(FullDash9csv$DarInstitutionCode=="FMNH" & FullDash9csv$DarCollectionCode=="Anthropology" & FullDash9csv$WhenAgeFrom>0),][c(10:14),]
+)
+write.csv(Full9sample, file = "FullDash9_samp.csv", na="", row.names = FALSE)
+
+
 FullDash9csvSAMP <- FullDash9csv[c(700:800,28700:28900,49400:49450,81150:81200,158500:158600,1527000:1527100,1567200:1567300,3000000:3000100,3628000:3628200),]
 write.csv(FullDash9csvSAMP, file = "FullDash13_samp.csv", na="", row.names = FALSE)
 
