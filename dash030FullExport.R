@@ -62,49 +62,52 @@ FullDash9csv$Where[which(is.na(FullDash9csv$Where)==T)] <- ""
 print(paste(date(), "-- ...finished full-data prep; starting sample-data prep."))
 
 
-# Setup sample dataset
+# Prep sample dataset ####
 
-FullDashSample1 <- FullDash9csv[which(((FullDash9csv$irn %in% SampleGroupC) & FullDash9csv$RecordType=="Catalog") |
-                                       ((FullDash9csv$irn %in% SampleGroupA) & FullDash9csv$RecordType=="Accession")),]
+FullDashSample1 <- FullDash9csv[which(((FullDash9csv$DarGlobalUniqueIdentifier %in% SampleGroupC) & FullDash9csv$RecordType=="Catalog") |
+                                       ((FullDash9csv$DarGlobalUniqueIdentifier %in% SampleGroupA) & FullDash9csv$RecordType=="Accession")),]
 
 # Scrub out irn's and other identifiers
-ScrubCat <- CatDash03Samp1[,c("irn","DarGlobalUniqueIdentifier")]
-colnames(ScrubCat)[2] <- "DarGUIDorig"
+ScrubCat <- data.frame("DarGlobalUniqueIdentifier" = CatDash03Samp1[,c("DarGlobalUniqueIdentifier")], stringsAsFactors = F)
 ScrubCat$irnScrub <- seq(12345,by=1,length.out = NROW(ScrubCat))
 ScrubCat$GUIDScrub <- seq(1234,by=1,length.out = NROW(ScrubCat))
 ScrubCat$GUIDScrub <- paste0("a",ScrubCat$irnScrub,"bc-1234-5a67-a123-a1bc23de", ScrubCat$GUIDScrub)
 
-ScrubAcc <- data.frame("irn" = AccBacklogSamp1[,c("irn")])
+ScrubAcc <- data.frame("DarGlobalUniqueIdentifier" = AccBacklogSamp1[,c("DarGlobalUniqueIdentifier")], stringsAsFactors = F)
 ScrubAcc$irnScrub <- seq(54321,by=1,length.out = NROW(ScrubAcc))
+ScrubAcc$GUIDScrub <- seq(1234,by=1,length.out = NROW(ScrubAcc))
+ScrubAcc$GUIDScrub <- paste0("a",ScrubAcc$irnScrub,"bc-1234-5a67-a123-a1bc23de", ScrubAcc$GUIDScrub)
 
-ScrubFull <- rbind(ScrubCat[,c("irn","irnScrub")], ScrubAcc[,c("irn","irnScrub")])
+ScrubFull <- rbind(ScrubCat[,c("DarGlobalUniqueIdentifier","GUIDScrub","irnScrub")], 
+                   ScrubAcc[,c("DarGlobalUniqueIdentifier","GUIDScrub","irnScrub")])
 
 # merge
-AccBacklogSamp <- merge(AccBacklogSamp1, ScrubAcc, by="irn", all.x=T)
-CatDash03Samp <- merge(CatDash03Samp1, ScrubCat, by="irn", all.x=T)
+AccBacklogSamp <- merge(AccBacklogSamp1, ScrubAcc, by="DarGlobalUniqueIdentifier", all.x=T)
+CatDash03Samp <- merge(CatDash03Samp1, ScrubCat, by="DarGlobalUniqueIdentifier", all.x=T)
 # # FIX THIS
-# FullDashSample <- merge(FullDashSample1, ScrubFull, by="DarGlobalUniqueIdentifier", all.x=T)
+FullDashSample <- merge(FullDashSample1, ScrubFull, by="DarGlobalUniqueIdentifier", all.x=T)
 
 # scrub id #s
+AccBacklogSamp$DarGlobalUniqueIdentifier <- AccBacklogSamp$GUIDScrub
 AccBacklogSamp$irn <- AccBacklogSamp$irnScrub
-AccBacklogSamp <- select(AccBacklogSamp, -irnScrub)
-AccBacklogSamp$AccAccessionDescription <- gsub("[[:digit:]]","5",AccBacklogSamp$AccAccessionDescription)
-AccBacklogSamp$AccCatalogueNo <- gsub("[[:digit:]]","5",AccBacklogSamp$AccCatalogueNo)
-AccBacklogSamp$AccDescription <- gsub("[[:digit:]]","5",AccBacklogSamp$AccDescription)
+AccBacklogSamp <- select(AccBacklogSamp, -c(irnScrub, GUIDScrub))
+AccBacklogSamp$AccAccessionDescription <- gsub("[[:digit:]]","5", AccBacklogSamp$AccAccessionDescription)
+AccBacklogSamp$AccCatalogueNo <- gsub("[[:digit:]]", "5", AccBacklogSamp$AccCatalogueNo)
+AccBacklogSamp$AccDescription <- gsub("[[:digit:]]", "5", AccBacklogSamp$AccDescription)
 
-CatDash03Samp$irn <- CatDash03Samp$irnScrub
 CatDash03Samp$DarGlobalUniqueIdentifier <- CatDash03Samp$GUIDScrub
-CatDash03Samp <- select(CatDash03Samp, -c(irnScrub,GUIDScrub,DarGUIDorig))
-CatDash03Samp$DarCatalogNumber <- gsub("[[:digit:]]","5",CatDash03Samp$DarCatalogNumber)
-CatDash03Samp$DarImageURL <- gsub("[[:digit:]]","5",CatDash03Samp$DarImageURL)
+CatDash03Samp$irn <- CatDash03Samp$irnScrub
+CatDash03Samp <- select(CatDash03Samp, -c(irnScrub, GUIDScrub))
+CatDash03Samp$DarCatalogNumber <- gsub("[[:digit:]]","5", CatDash03Samp$DarCatalogNumber)
+CatDash03Samp$DarImageURL <- gsub("[[:digit:]]","5", CatDash03Samp$DarImageURL)
 CatDash03Samp$DarLatitude <- as.integer(CatDash03Samp$DarLatitude)
 CatDash03Samp$DarLongitude <- as.integer(CatDash03Samp$DarLongitude)
 
-# # Need to fix this
-# FullDashSample$irn <- FullDashSample$irnScrub
-# FullDashSample <- select(FullDashSample, -irnScrub)
-# FullDashSample$DarLatitude <- as.integer(FullDashSample$DarLatitude)
-# FullDashSample$DarLongitude <- as.integer(FullDashSample$DarLongitude)
+# Need to fix this
+FullDashSample$DarGlobalUniqueIdentifier <- FullDashSample$GUIDScrub
+FullDashSample <- select(FullDashSample, -GUIDScrub)
+FullDashSample$DarLatitude <- as.integer(FullDashSample$DarLatitude)
+FullDashSample$DarLongitude <- as.integer(FullDashSample$DarLongitude)
 
 
 print(paste(date(), "-- ...finished sample-data prep; starting export of final dataset & LUTs."))
@@ -113,9 +116,9 @@ print(paste(date(), "-- ...finished sample-data prep; starting export of final d
 # Export full dataset CSV ####
 setwd(paste0(origdir,"/output"))
 
-# TEMP FIX # # # #
-FullDash9csv$DarInstitutionCode[which(is.na(FullDash9csv$DarInstitutionCode)==T)] <- "FMNH" 
-FullDash9csv$DarInstitutionCode[which(FullDash9csv$DarInstitutionCode=="FALSE" | FullDash9csv$DarInstitutionCode=="F")] <- "FMNH"
+# # TEMP FIX # # # #
+# FullDash9csv$DarInstitutionCode[which(is.na(FullDash9csv$DarInstitutionCode)==T)] <- "FMNH" 
+# FullDash9csv$DarInstitutionCode[which(FullDash9csv$DarInstitutionCode=="FALSE" | FullDash9csv$DarInstitutionCode=="F")] <- "FMNH"
 
 # Check for duplicates
 FullDash9csv <- unique(FullDash9csv)
@@ -129,53 +132,13 @@ if (NROW(FullDash9csv)>0 & NROW(FullD9_check2)==0) {
 }
 
 
-# Setup / Export sample records:
-Full9sample <- rbind(
-  FullDash9csv[(FullDash9csv$DarInstitutionCode=="PM"),][c(3:6,200:205),], # 8005:8010,99905:9990
-  FullDash9csv[(FullDash9csv$DarInstitutionCode=="PM" & FullDash9csv$WhenAgeFrom>0),][c(5:9),],
-  FullDash9csv[(FullDash9csv$DarInstitutionCode=="OI"),][c(3:6,200:205),],
-  FullDash9csv[(FullDash9csv$DarInstitutionCode=="OI" & FullDash9csv$WhenAgeFrom>0),][c(5:9),],
-  FullDash9csv[(FullDash9csv$DarInstitutionCode=="FMNH" & FullDash9csv$RecordType=="Catalog"),][c(305:312),],
-  FullDash9csv[(FullDash9csv$DarInstitutionCode=="FMNH" & FullDash9csv$RecordType=="Accession"),][c(13692:13696,12610:12613),],
-  FullDash9csv[(FullDash9csv$DarInstitutionCode=="FMNH" & FullDash9csv$DarCollectionCode=="Anthropology"),][c(130:134),],
-  FullDash9csv[(FullDash9csv$DarInstitutionCode=="FMNH" & FullDash9csv$DarCollectionCode=="Anthropology" & FullDash9csv$WhenAgeFrom>0),][c(10:14),]
-)
-write.csv(Full9sample, file = "FullDash9_samp.csv", na="", row.names = FALSE)
-
-
-FullDash9csvSAMP <- FullDash9csv[c(700:800,28700:28900,49400:49450,81150:81200,158500:158600,1527000:1527100,1567200:1567300,3000000:3000100,3628000:3628200),]
-write.csv(FullDash9csvSAMP, file = "FullDash13_samp.csv", na="", row.names = FALSE)
-
-# Dump test dataset for Cultural Collections Dashboard
-# - TO DO: 
-#       - cut rbind with Accessions when those are absent?
-#       - also cut DwC dataset imports when absent?
-
-FullDash10test <- FullDash9csv[which(FullDash9csv$RecordType=="Catalog" & FullDash9csv$DarCollectionCode=="Anthropology"),]
-write.csv(FullDash10test, file = "FullDash13_10test.csv", na="", row.names = FALSE)
-
-
-# # Bind extra dummy-data (with multiple institutions)
-# FullDash9altA <- FullDash9csv[c(2101:14600,15001:20000),]
-# FullDash9altA$DarInstitutionCode <- "Mars"
+# # Dump test dataset for Cultural Collections Dashboard
+# # - TO DO: 
+# #       - cut rbind with Accessions when those are absent?
+# #       - also cut DwC dataset imports when absent?
 # 
-# FullDash9altB <- FullDash9csv[c(701:1300,10001:80000),]
-# FullDash9altB$DarInstitutionCode <- "Venus"
-# 
-# FullDash9altC <- FullDash9csv[c(61401:92400,2450001:2550000),]
-# FullDash9altC$DarInstitutionCode <- "Pluto"
-# 
-# FullDash9alt <- rbind(FullDash9csv, FullDash9altA, FullDash9altB, FullDash9altC)
-# FullDash9alt <- unique(FullDash9alt)
-# FullD9a_check1 <- dplyr::count(FullDash9alt, DarInstitutionCode, RecordType, irn)
-# FullD9a_check2 <- FullD9a_check1[which(FullD9a_check1$n>1),]
-# 
-# #View(FullDash9csv[which(is.na(FullDash9csv$DarInstitutionCode)==T),])
-# if (NROW(FullDash9alt)>0 & NROW(FullD9a_check2)==0) {
-#   write.csv(FullDash9alt, file = "FullDash13alt.csv", na="", row.names = F)
-# } else {
-#   print ("Error - Check for duplicate records; FullDash13alt.csv not exported")
-# }
+# FullDash10test <- FullDash9csv[which(FullDash9csv$RecordType=="Catalog" & FullDash9csv$DarCollectionCode=="Anthropology"),]
+# write.csv(FullDash10test, file = "FullDash13_10test.csv", na="", row.names = FALSE)
 
 
 # Export sample dataset CSV ####

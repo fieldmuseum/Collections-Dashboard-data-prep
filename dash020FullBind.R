@@ -22,18 +22,28 @@ if (exists("CatDash03")==TRUE) {
   CatDash2 <- read.csv(file="CatDash03bu.csv", stringsAsFactors = F, na.strings = "", encoding="latin1")
 }
 
-
-# Setup sample raw Catalogue data
-SampleGroupC <- c(1321,1:5,615690:615694,537448:537450,567365:567370,245483:245488,99482,8290:8296,54463,50771,136283,288069,388945)
-# CatDash03Samp1 <- CatDash2[which(CatDash2$irn %in% SampleGroupC),]
-CatDash03Samp1 <- CatDash2[SampleGroupC,]
+# Fix DarInstitutionCode for FMNH Collections # TEMP FIX # # # #
+CatDash2$DarInstitutionCode[which(is.na(CatDash2$DarInstitutionCode)==T)] <- "FMNH" 
+CatDash2$DarInstitutionCode[which(CatDash2$DarInstitutionCode=="FALSE" | CatDash2$DarInstitutionCode=="F")] <- "FMNH"
 
 CatDash2 <- unique(CatDash2)
 #check <- dplyr::count(CatDash3, irn)
 
 
-# Bind GBIF and EMu Catalog data + GBIF-backlog data if present ####
+# Setup sample raw Catalogue data
+CatDash03Samp1 <- rbind(
+  CatDash2[(CatDash2$DarInstitutionCode=="PM"),][c(3:6,200:205),], # 8005:8010,99905:9990
+  CatDash2[(CatDash2$DarInstitutionCode=="PM" & CatDash2$WhenAgeFrom>0),][c(5:9),],
+  CatDash2[(CatDash2$DarInstitutionCode=="OI"),][c(3:6,200:205),],
+  CatDash2[(CatDash2$DarInstitutionCode=="OI" & CatDash2$WhenAgeFrom>0),][c(5:9),],
+  CatDash2[(CatDash2$DarInstitutionCode=="FMNH" & CatDash2$RecordType=="Catalog"),][c(305:312),],
+  CatDash2[(CatDash2$DarInstitutionCode=="FMNH" & CatDash2$DarCollectionCode=="Anthropology"),][c(130:134),],
+  CatDash2[(CatDash2$DarInstitutionCode=="FMNH" & CatDash2$DarCollectionCode=="Anthropology" & CatDash2$WhenAgeFrom>0),][c(10:14),]
+)
+SampleGroupC <- CatDash03Samp1$DarGlobalUniqueIdentifier
 
+
+# Bind GBIF and EMu Catalog data + GBIF-backlog data if present ####
 
 library("plyr")
 
@@ -110,7 +120,11 @@ AccDash1$DarInstitutionCode <- "FMNH"
 # Setup Sample Raw Accession data
 SampleGroupA <- c(10576,44071,38855,46333,47764,31971,26200,20714,29028,26226,24962,20453,36113,11339)
 AccBacklogSamp1 <- AccDash1[which(AccDash1$irn %in% SampleGroupA),]
-
+AccBacklogSamp1$DarGlobalUniqueIdentifier <-  paste(AccBacklogSamp1$DarInstitutionCode,
+                                                    "accession-irn",
+                                                    AccBacklogSamp1$irn,
+                                                    sep="-")
+SampleGroupA <- AccBacklogSamp1$DarGlobalUniqueIdentifier
 
 
 # Map Acc fields to Cat fields
