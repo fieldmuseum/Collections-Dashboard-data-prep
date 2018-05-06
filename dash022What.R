@@ -49,85 +49,43 @@ WhatDash4[,3:NCOL(WhatDash4)] <- sapply(WhatDash4[,3:NCOL(WhatDash4)], function 
 WhatDash4[,3:NCOL(WhatDash4)] <- sapply(WhatDash4[,3:NCOL(WhatDash4)], function (x) gsub("^\\s+|\\s+$", "", x))
 date()
 
+
+
 WhatDash4$DarCollectionCode <- gsub("Invertebrate Zoology", "Invertebrates", WhatDash4$DarCollectionCode)
 WhatDash4$DarCollectionCode <- gsub("and", "", WhatDash4$DarCollectionCode)
 WhatDash4$DarCollectionCode <- gsub("\\|| ", " | ", WhatDash4$DarCollectionCode)
 WhatDash4$DarCollectionCode <- gsub("Physical \\| Geology", "Physical Geology", WhatDash4$DarCollectionCode)
 
-WhatDash4$AccDesc01 <- gsub("\\|| ", " | ", WhatDash4$AccDescription)
+WhatDash4$AccDesc01 <- WhatDash4$AccDescription
+WhatDash4$AccDesc02 <- WhatDash4$AccDescription2
+WhatDash4$DarDesc01 <- WhatDash4$DarRelatedInformation
+WhatDash4$EcbName   <- WhatDash4$EcbNameOfObject
+
+date()
+# # clean punctuation + simpleCap
+CleanCols <- c("AccDesc01", "AccDesc02", "DarDesc01", "EcbName", "ComName_tab", "DesMaterials_tab")
+
+WhatDash4[,colnames(WhatDash4) %in% CleanCols] <- sapply(WhatDash4[,colnames(WhatDash4) %in% CleanCols], textClean)
+WhatDash4[,colnames(WhatDash4) %in% CleanCols] <- sapply(WhatDash4[,colnames(WhatDash4) %in% CleanCols], wordCut)
+WhatDash4[,colnames(WhatDash4) %in% CleanCols] <- sapply(WhatDash4[,colnames(WhatDash4) %in% CleanCols], spaceClean)
+WhatDash4[,colnames(WhatDash4) %in% CleanCols] <- sapply(WhatDash4[,colnames(WhatDash4) %in% CleanCols], nanaClean)
+
+WhatDash4$DarScientificName[WhatDash4$DarCollectionCode=="Anthropology"] <- sapply(WhatDash4$DarScientificName[WhatDash4$DarCollectionCode=="Anthropology"], textClean)
+
+date()
+
+# WhatDash4b <- WhatDash4
+# WhatDash4b[,colnames(WhatDash4b) %in% CleanCols] <- sapply(WhatDash4b[,colnames(WhatDash4b) %in% CleanCols], function(x) simpleCap(x))
 WhatDash4$AccDesc01 <- sapply(WhatDash4$AccDesc01, simpleCap)
-
-WhatDash4$AccDesc02 <- gsub("[[:punct:]]", " ", WhatDash4$AccDescription2)
-WhatDash4$AccDesc02 <- gsub(paste(CutFirst, collapse="|"), " ", WhatDash4$AccDesc02, ignore.case = T)
-WhatDash4$AccDesc02 <- gsub(paste0(CutWords, collapse="|"), " ", WhatDash4$AccDesc02, ignore.case = T)
-WhatDash4$AccDesc02 <- gsub(" [[:alpha:]]{1} ", " ", WhatDash4$AccDesc02, ignore.case = T)
-WhatDash4$AccDesc02 <- gsub("^\\s+|\\s+$", "", WhatDash4$AccDesc02)
-WhatDash4$AccDesc02 <- gsub("\\s+", " ", WhatDash4$AccDesc02)
 WhatDash4$AccDesc02 <- sapply(WhatDash4$AccDesc02, simpleCap)
-WhatDash4$AccDesc02 <- gsub(" ", " | ", WhatDash4$AccDesc02)
-WhatDash4$AccDesc02 <- gsub("(\\|\\s+)+", "| ", WhatDash4$AccDesc02)
-
-WhatDash4$AccDesc02 <- gsub("[[:punct:]]", " ", WhatDash4$AccDescription2)
-WhatDash4$AccDesc02 <- gsub(paste(CutFirst, collapse="|"), " ", WhatDash4$AccDesc02, ignore.case = T)
-WhatDash4$AccDesc02 <- gsub(paste0(CutWords, collapse="|"), " ", WhatDash4$AccDesc02, ignore.case = T)
-WhatDash4$AccDesc02 <- gsub(" [[:alpha:]]{1} ", " ", WhatDash4$AccDesc02, ignore.case = T)
-WhatDash4$AccDesc02 <- gsub("^\\s+|\\s+$", "", WhatDash4$AccDesc02)
-WhatDash4$AccDesc02 <- gsub("\\s+", " ", WhatDash4$AccDesc02)
-WhatDash4$AccDesc02 <- sapply(WhatDash4$AccDesc02, simpleCap)
-WhatDash4$AccDesc02 <- gsub(" ", " | ", WhatDash4$AccDesc02)
-WhatDash4$AccDesc02 <- gsub("(\\|\\s+)+", "| ", WhatDash4$AccDesc02)
-
-WhatDash4$DarDesc01 <- gsub("[[:punct:]]", " ", WhatDash4$DarRelatedInformation)
-WhatDash4$DarDesc01 <- gsub(paste(CutFirst, collapse="|"), " ", WhatDash4$DarDesc01, ignore.case = T)
-WhatDash4$DarDesc01 <- gsub(paste0(CutWords, collapse="|"), " ", WhatDash4$DarDesc01, ignore.case = T)
-WhatDash4$DarDesc01 <- gsub(" [[:alpha:]]{1} ", " ", WhatDash4$DarDesc01, ignore.case = T)
-WhatDash4$DarDesc01 <- gsub("\\s+", " ", WhatDash4$DarDesc01)
-WhatDash4$DarDesc01 <- gsub("^\\s+|\\s+$", "", WhatDash4$DarDesc01)
 WhatDash4$DarDesc01 <- sapply(WhatDash4$DarDesc01, simpleCap)
-WhatDash4$DarDesc01 <- gsub(" ", " | ", WhatDash4$DarDesc01)
-WhatDash4$DarDesc01 <- gsub("(\\|\\s+)+", "| ", WhatDash4$DarDesc01)
-
-WhatDash4$EcbName <- gsub("[[:punct:]]", " ", WhatDash4$EcbNameOfObject)
-WhatDash4$EcbName <- gsub(paste(CutFirst, collapse="|"), " ", WhatDash4$EcbName, ignore.case = T)
-WhatDash4$EcbName <- gsub(paste0(CutWords, collapse="|"), " ", WhatDash4$EcbName, ignore.case = T)
-WhatDash4$EcbName <- gsub(" [[:alpha:]]{1} ", " ", WhatDash4$EcbName, ignore.case = T)
-WhatDash4$EcbName <- gsub("^\\s+|\\s+$", "", WhatDash4$EcbName)
-WhatDash4$EcbName <- gsub("\\s+", " ", WhatDash4$EcbName)
-WhatDash4$EcbName <- sapply(WhatDash4$EcbName, simpleCap)
-WhatDash4$EcbName <- gsub(" ", " | ", WhatDash4$EcbName)
-WhatDash4$EcbName <- gsub("(\\|\\s+)+", "| ", WhatDash4$EcbName)
-
-WhatDash4$DarScientificName[WhatDash4$DarCollectionCode=="Anthropology"] <- gsub("[[:punct:]]|\\|", " ", WhatDash4$DarScientificName[WhatDash4$DarCollectionCode=="Anthropology"])
-WhatDash4$DarScientificName[WhatDash4$DarCollectionCode=="Anthropology"] <- gsub(paste(CutFirst, collapse="|"), " ", WhatDash4$DarScientificName[WhatDash4$DarCollectionCode=="Anthropology"], ignore.case = T)
-WhatDash4$DarScientificName[WhatDash4$DarCollectionCode=="Anthropology"] <- gsub(paste0(CutWords, collapse="|"), " ", WhatDash4$DarScientificName[WhatDash4$DarCollectionCode=="Anthropology"], ignore.case = T)
-WhatDash4$DarScientificName[WhatDash4$DarCollectionCode=="Anthropology"] <- gsub(" [[:alpha:]]{1} |^[[:alpha:]]{1} ", " ", WhatDash4$DarScientificName[WhatDash4$DarCollectionCode=="Anthropology"], ignore.case = T)
-WhatDash4$DarScientificName[WhatDash4$DarCollectionCode=="Anthropology"] <- gsub("^\\s+|\\s+$", "", WhatDash4$DarScientificName[WhatDash4$DarCollectionCode=="Anthropology"])
-WhatDash4$DarScientificName[WhatDash4$DarCollectionCode=="Anthropology"] <- gsub("\\s+", " ", WhatDash4$DarScientificName[WhatDash4$DarCollectionCode=="Anthropology"])
+WhatDash4$EcbName   <- sapply(WhatDash4$EcbName, simpleCap)
 WhatDash4$DarScientificName[WhatDash4$DarCollectionCode=="Anthropology"] <- sapply(WhatDash4$DarScientificName[WhatDash4$DarCollectionCode=="Anthropology"], simpleCap)
-WhatDash4$DarScientificName[WhatDash4$DarCollectionCode=="Anthropology"] <- gsub(" ", " | ", WhatDash4$DarScientificName[WhatDash4$DarCollectionCode=="Anthropology"])
-WhatDash4$DarScientificName[WhatDash4$DarCollectionCode=="Anthropology"] <- gsub("(\\|\\s+)+", "| ", WhatDash4$DarScientificName[WhatDash4$DarCollectionCode=="Anthropology"])
-
-WhatDash4$ComName_tab[which(grepl("`",WhatDash4$ComName_tab)<1)] <- gsub("[[:punct:]]", " ", WhatDash4$ComName_tab[which(grepl("`",WhatDash4$ComName_tab)<1)])
-WhatDash4$ComName_tab <- gsub(paste(CutFirst, collapse="|"), " ", WhatDash4$ComName_tab, ignore.case = T)
-WhatDash4$ComName_tab <- gsub(paste0(CutWords, collapse="|"), " ", WhatDash4$ComName_tab, ignore.case = T)
-WhatDash4$ComName_tab <- gsub(" [[:alpha:]]{1} ", " ", WhatDash4$ComName_tab, ignore.case = T)
-WhatDash4$ComName_tab <- gsub("^\\s+|\\s+$", "", WhatDash4$ComName_tab)
-WhatDash4$ComName_tab <- gsub("\\s+", " ", WhatDash4$ComName_tab)
 WhatDash4$ComName_tab[which(grepl("`",WhatDash4$ComName_tab)<1)] <- sapply(WhatDash4$ComName_tab[which(grepl("`",WhatDash4$ComName_tab)<1)], simpleCap)
-WhatDash4$ComName_tab <- gsub(" ", " | ", WhatDash4$ComName_tab)
-WhatDash4$ComName_tab <- gsub("(\\|\\s+)+", "| ", WhatDash4$ComName_tab)
+WhatDash4$DesMaterials_tab   <- sapply(WhatDash4$DesMaterials_tab, simpleCap)
 
+date()
 
-#WhatDash4$DesMaterials_tab <- gsub(" \\| | ", " | ", WhatDash4$DesMaterials_tab)
-WhatDash4$DesMaterials_tab <- gsub("[[:punct:]]|\\|", " ", WhatDash4$DesMaterials_tab)
-WhatDash4$DesMaterials_tab <- gsub(paste(CutFirst, collapse="|"), " ", WhatDash4$DesMaterials_tab, ignore.case = T)
-WhatDash4$DesMaterials_tab <- gsub(paste0(CutWords, collapse="|"), " ", WhatDash4$DesMaterials_tab, ignore.case = T)
-WhatDash4$DesMaterials_tab <- gsub(" [[:alpha:]]{1} ", " ", WhatDash4$DesMaterials_tab, ignore.case = T)
-WhatDash4$DesMaterials_tab <- gsub("^\\s+|\\s+$", "", WhatDash4$DesMaterials_tab)
-WhatDash4$DesMaterials_tab <- gsub("\\s+", " ", WhatDash4$DesMaterials_tab)
-WhatDash4$DesMaterials_tab <- sapply(WhatDash4$DesMaterials_tab, simpleCap)
-WhatDash4$DesMaterials_tab <- gsub(" ", " | ", WhatDash4$DesMaterials_tab)
-WhatDash4$DesMaterials_tab <- gsub("(\\|\\s+)+", "| ", WhatDash4$DesMaterials_tab)
 
 #WhatDash4b <- WhatDash4 %>% separate(AccDescription, c("AccDesc01", "AccDesc02", "AccDesc03", "AccDesc04"), 
 #                                    sep="\\|", extra="merge", fill="right")
@@ -261,7 +219,6 @@ WhatDash5 <- unite(WhatDash4, "What", c(DarCollectionCode,
                                         AccDesc01,
                                         AccDesc02,
                                         DarDesc01,
-                                      # DarRelatedInformation,
                                         DarScientificName,
                                         EcbName
                                         ), sep=" | ", remove=T) 

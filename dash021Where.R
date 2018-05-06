@@ -80,7 +80,7 @@ print(paste("... ",substr(date(), 12, 19), "- really cleaning WHERE data (starti
 # CleanCap <- c("cleanDarCountry", "cleanAccLocality", "cleanAccGeography",
 #               "cleanDarContinent", "cleanDarContinentOcean", "cleanDarWaterBody")
 # FullDash2[,colnames(FullDash2) %in% CleanCap] <- sapply(FullDash2[,colnames(FullDash2) %in% CleanCap], simpleCap)
-
+# 
 FullDash2$cleanDarCountry <- sapply (FullDash2$cleanDarCountry, simpleCap)
 FullDash2$cleanAccLocality <- sapply (FullDash2$cleanAccLocality, simpleCap)
 FullDash2$cleanAccGeography <- sapply (FullDash2$cleanAccGeography, simpleCap)
@@ -92,6 +92,7 @@ date()
 
 AccGeographyLUT$WhereLUT <- sapply (AccGeographyLUT$WhereLUT, simpleCap)
 
+date()
 
 # Make single 'Where' field ####
 print(paste("... ",substr(date(), 12, 19), "- uniting WHERE data..."))
@@ -103,6 +104,8 @@ print(paste("... ",substr(date(), 12, 19), "- final cleanup for united WHERE dat
 
 FullDash3$Where <- sapply(FullDash3$Where, finalClean)
 FullDash3$Where[which(grepl("[[:alpha:]]",FullDash3$Where)<1)] <- ""
+
+# WhereTest <- data.frame("WhereLUT" = unique(FullDash3$Where), stringsAsFactors = F)
 
 
 #  Set integer fields 
@@ -127,9 +130,11 @@ FullDash3csv <- FullDash3[,c("DarGlobalUniqueIdentifier","DarLatitude","DarLongi
 # Build Where LUTs ####
 print(paste("... ",substr(date(), 12, 19), "- building WHERE lookup table..."))
 
+# + Continent & Ocean ####
 WhereLUT1 <- data.frame("WhereLUT" = levels(as.factor(FullDash2$cleanDarContinent)), stringsAsFactors = F)
 WhereLUT2 <- data.frame("WhereLUT" = levels(as.factor(FullDash2$cleanDarContinentOcean)), stringsAsFactors = F)
 
+# + Country (n > 150) ####
 WhereLUT3 <- data.frame("WhereLUT" = FullDash2$cleanDarCountry[which(nchar(FullDash2$cleanDarCountry)>1)], stringsAsFactors = F)
 WhereLUT3$WhereLUT[which(grepl("[[:alpha:]]",WhereLUT3$WhereLUT)<1)] <- ""
 WhereL3count <- dplyr::count(WhereLUT3, WhereLUT)
@@ -139,9 +144,10 @@ WhereLUT3 <- strsplit(as.character(WhereLUT3), split="\\|")
 WhereLUT3 <- data.frame("WhereLUT" = unique(unlist(WhereLUT3)), stringsAsFactors = F)
 WhereLUT3$WhereLUT <- sapply(WhereLUT3$WhereLUT, simpleCap)  # does this LUT-cleanup break matches to record data?
 
+# + WaterBody ####
 WhereLUT4 <- data.frame("WhereLUT" = levels(as.factor(FullDash2$cleanDarWaterBody)), stringsAsFactors = F)
 
-#WhereLUT5 <- data.frame("WhereLUT" = levels(as.factor(FullDash2$cleanAccLocality)), stringsAsFactors = F)
+# + AccLocality (n > 5) ####
 WhereLUT5 <- strsplit(FullDash2$cleanAccLocality[which(nchar(FullDash2$cleanAccLocality)>2)], "\\|")
 WhereLUT5$WhereLUT <- gsub(paste(CutFirst, collapse="|"), "", WhereLUT5$WhereLUT, ignore.case = T)
 CutWordsNoSpace <- gsub("\\s+", "", CutWords)
@@ -154,6 +160,7 @@ WhereL5count <- dplyr::count(WhereLUT5, WhereLUT)
 WhereL5count <- WhereL5count[which(WhereL5count$n > 5),]
 WhereLUT5 <- data.frame("WhereLUT"=unique(WhereLUT5[which(WhereLUT5$WhereLUT %in% WhereL5count$WhereLUT),]))
 
+# + AccGeography ####
 WhereLUT6 <- data.frame("WhereLUT" = AccGeographyLUT$WhereLUT, stringsAsFactors = F)
 WhereLUT6 <- strsplit(AccGeographyLUT$WhereLUT[which(nchar(AccGeographyLUT$WhereLUT)>2)], "\\|")
 WhereLUT6$WhereLUT <- gsub(paste(CutFirst, collapse="|"), "", WhereLUT6$WhereLUT, ignore.case = T)
@@ -166,11 +173,9 @@ WhereL6count <- dplyr::count(WhereLUT6, WhereLUT)
 WhereL6count <- WhereL5count[which(WhereL6count$n > 1),]
 WhereLUT6 <- data.frame("WhereLUT"=unique(WhereLUT6[which(WhereLUT6$WhereLUT %in% WhereL6count$WhereLUT),]))
 
-
+# Combine/Clean WhereLUT ####
 WhereLUTall <- rbind(OIlut_where, # need extra cleanup?
                      WhereLUT1, WhereLUT2, WhereLUT3, WhereLUT4, WhereLUT5, WhereLUT6)# ADD AccWhereLUT
-#WhereLUTall$WhereLUT[which(substr(WhereLUTall$WhereLUT,1,1)==" ")] <- substr(WhereLUTall$WhereLUT[which(substr(WhereLUTall$WhereLUT,1,1)==" ")],2,nchar(WhereLUTall$WhereLUT[which(substr(WhereLUTall$WhereLUT,1,1)==" ")]))
-#WhereLUTall$WhereLUT[which(substr(WhereLUTall$WhereLUT,nchar(WhereLUTall$WhereLUT),nchar(WhereLUTall$WhereLUT))==" ")] <- substr(WhereLUTall$WhereLUT[which(substr(WhereLUTall$WhereLUT,nchar(WhereLUTall$WhereLUT),nchar(WhereLUTall$WhereLUT))==" ")],1,nchar(WhereLUTall$WhereLUT[which(substr(WhereLUTall$WhereLUT,nchar(WhereLUTall$WhereLUT),nchar(WhereLUTall$WhereLUT))==" ")])-1)
 WhereLUTall$WhereLUT <- gsub("^\\s+|\\s+$", "", WhereLUTall$WhereLUT)
 WhereLUTall$WhereLUT <- gsub("^\\'|\\.|\\'$", "", WhereLUTall$WhereLUT)
 WhereLUTall$WhereLUT <- gsub("United States| Usa |^Usa$| Usa$| Us |^Us$| Us$", "U.S.A.", WhereLUTall$WhereLUT, ignore.case=T)

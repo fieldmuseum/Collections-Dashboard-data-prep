@@ -2,6 +2,7 @@
 
 # Trim punctuation ####
 textClean <- function (x, keepApostrophe=T) {
+  x <- gsub("`", "'", x)
   ifelse(
     keepApostrophe==T,
     x <- gsub("\\[|\\]|[(,)&?!=;/:#\"*]|[-]|[0-9]", " ", x),  # leaves in apostrophes [']
@@ -13,7 +14,7 @@ textClean <- function (x, keepApostrophe=T) {
   x <- gsub("U\\.s\\.s\\.r", "U.S.S.R", x, ignore.case=T)
   x <- gsub("U\\.s\\.", "U.S.", x, ignore.case=T)
   x <- gsub("NANA|^Na$", "", x, ignore.case=T)
-  x <- gsub("\\.\\.", ".", x, ignore.case=T)
+  x <- gsub("\\.\\.", ".", x)
 }
 
 
