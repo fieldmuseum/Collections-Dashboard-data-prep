@@ -47,13 +47,14 @@ WhoLUT <- data.frame("WhoLUT" = unique(WhoLUT[which((WhoLUT$WhoLUT %in% WhoCount
 WhoLUT <- data.frame("WhoLUT"=WhoLUT[order(WhoLUT$WhoLUT),], stringsAsFactors = F)
 
 
-print(paste("... ",substr(date(), 12, 19), "- back to cleaning WHO -- next step takes ~30min..."))
+print(paste("... ",substr(date(), 12, 19), "- back to cleaning WHO -- next step can take ~30min..."))
 
 
 WhoDash$EcbNameOfObject[is.na(WhoDash$EcbNameOfObject)==T] <- ""
 
-WhoDash <- separate(WhoDash, EcbNameOfObject, c("EcbNam1","EcbNam2","EcbNam3","EcbNam4","EcbNam5","EcbNam6"), remove=F)
 
+WhoDash <- separate(WhoDash, EcbNameOfObject, c("EcbNam1","EcbNam2","EcbNam3","EcbNam4","EcbNam5","EcbNam6"), remove=F)
+print("Warning about 'Missing pieces filled with NA' is normal here")
 
 WhoDash$AccDescription[is.na(WhoDash$AccDescription)==T] <- ""
 WhoDash$AccDescription <- gsub("\\|| ", " | ", WhoDash$AccDescription)
@@ -76,9 +77,10 @@ date()
 # This only takes the first 6 words, so likely misses a lot of values, but in the interest of time...
 WhoDash <- separate(WhoDash, AccDescription, c("Acc1Nam1","Acc1Nam2","Acc1Nam3","Acc1Nam4","Acc1Nam5","Acc1Nam6"), remove=F)
 WhoDash <- separate(WhoDash, AccDescription2, c("Acc2Nam1","Acc2Nam2","Acc2Nam3","Acc2Nam4","Acc2Nam5","Acc2Nam6"), remove=F)
+print("Warning about 'Missing pieces filled with NA' is normal here")
 
 
-print(paste("... ",substr(date(), 12, 19), "- still cleaning WHO -- next step takes ~50min..."))
+print(paste("... ",substr(date(), 12, 19), "- still cleaning WHO -- next step can take ~50min..."))
 
 date()
 WhoDashExt <- WhoDash[,c("DarGlobalUniqueIdentifier",

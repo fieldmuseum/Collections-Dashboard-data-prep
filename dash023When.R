@@ -63,12 +63,14 @@ AttCheck2 <- AttCheck[which(AttCheck$AttPeriod_tab %in% AttPerLUT$AttPer),]
 WhenDash$Date <- gsub("\\s+", " ", WhenDash$Date)
 WhenDash$Date <- gsub("^\\s+|\\s+$", "", WhenDash$Date)
 
-WhenDash$DateBU <- WhenDash$Date  # remove this if not needed
 WhenDash <- WhenDash %>% separate(Date, c("DateFrom", "DateTo"), sep=" ", extra="merge")
-WhenDash$DateFrom <- as.numeric(WhenDash$DateFrom)
-WhenDash$DateTo <- as.numeric(WhenDash$DateTo)
+# Warnings about "Missing pieces filled with 'NA'" are normal here.
+
+WhenDash$DateFrom <- as.numeric(WhenDash$DateFrom)  # Warning about "NAs introduced by coercion" is normal. 
+WhenDash$DateTo <- as.numeric(WhenDash$DateTo)      # Warning about "NAs introduced by coercion" is normal.
 WhenDash$DateFrom[which(grepl("[Bb]c", WhenDash$AttPeriod_tab)>0)] <- -1 * WhenDash$DateFrom[which(grepl("[Bb]c", WhenDash$AttPeriod_tab)>0)]
 WhenDash$DateTo[which(grepl("[Bb]c", WhenDash$AttPeriod_tab)>0)] <- -1 * WhenDash$DateTo[which(grepl("[Bb]c", WhenDash$AttPeriod_tab)>0)]
+print("Warning about 'Missing pieces filled with NA' is normal here")
 
 
 AttPerLUT <- as.data.frame(levels(as.factor(WhenDash$AttPeriod_tab[which((abs(WhenDash$DateFrom + WhenDash$DateTo)<1 | is.na(WhenDash$DateFrom)+is.na(WhenDash$DateTo)==2) & nchar(WhenDash$AttPeriod_tab)>2)])))
