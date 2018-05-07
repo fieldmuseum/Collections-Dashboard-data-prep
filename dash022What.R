@@ -239,6 +239,12 @@ FullDash4csv <- FullDash4csv[,c("DarGlobalUniqueIdentifier","DarLatitude","DarLo
                                 "What","DarCollectionCode","HasMM",
                                 "DarInstitutionCode")]
 
+# Memory cleanup
+
+rm(list = ls(pattern = "WhatDash"),
+   "FullDash3csv")
+gc()
+
 Log022What <- warnings()
 
 # reset working directory

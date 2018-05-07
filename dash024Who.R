@@ -145,6 +145,12 @@ WhoDash2$Who <- gsub("^NA$|^NA\\s+\\|\\s+|\\s+\\|\\s+NA$", "", WhoDash2$Who)
 #  4-Merge WHERE+WHAT+WHEN-WHO ####
 FullDash7csv <- merge(FullDash6csv, WhoDash2, by=c("DarGlobalUniqueIdentifier"), all.x=T)
 
+
+# Memory cleanup
+rm("FullDash6csv")
+rm(list = ls(pattern = "WhoDash"))
+gc()
+
 Log024Who <- warnings()
 
 setwd(origdir)

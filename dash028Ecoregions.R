@@ -55,6 +55,10 @@ DarCtryContOcean$Bioregion[which(is.na(DarCtryContOcean$Bioregion)==T)] <- ""
 
 FullDash8 <- merge(FullDash7csv, DarCtryContOcean, by=c("DarGlobalUniqueIdentifier"), all.x=T)
 
+# Memory Cleanup ####
+rm("FullDash2", "FullDash7csv")
+gc()
+
 Log028Ecoregions <- warnings()
 
 setwd(origdir)

@@ -66,29 +66,29 @@ if (DarYN=="Y") { source("dash005DarPrep.R") }
 
 # Added OI recordset import 06-feb-2018
 # ( CSV from OI's shared XLSX report )
-source("dash006OIcsvImport.R")
+source("dash006OIcsvImport.R", verbose = T)
 
 # Added Penn-Museum recordset import 26-jan-2018
 # ( https://www.penn.museum/collections/objects/data.php )
-source("dash007PMcsvImport.R")
+source("dash007PMcsvImport.R", verbose = T)
 
 # if (!file.exists("data01raw/CatDash03bu.csv")) { source("dash010CatPrep.R") }
-source("dash010CatPrep.R")
-if (AccYN=="Y") { source("dash015AccPrep.R") }
+source("dash010CatPrep.R", verbose = T)
+if (AccYN=="Y") { source("dash015AccPrep.R", verbose = T) }
 
-source("dash020FullBind.R")
-source("dash021Where.R")
-source("dash022What.R")
-source("dash023When.R")
-source("dash024Who.R")
+source("dash020FullBind.R", verbose = T)
+source("dash021Where.R", verbose = T)
+source("dash022What.R", verbose = T)
+source("dash023When.R", verbose = T)
+source("dash024Who.R", verbose = T)
 
 # Added these [May-2017]:
-source("dash025Experience.R")
-source("dash026LoansPrep.R")
-source("dash027VisitPrep.R")
-source("dash028Ecoregions.R")
+source("dash025Experience.R", verbose = T)
+source("dash026LoansPrep.R", verbose = T)
+source("dash027VisitPrep.R", verbose = T)
+source("dash028Ecoregions.R", verbose = T)
 
-source("dash030FullExport.R")
+source("dash030FullExport.R", verbose = T)
 
 # Institution summaries?
 #source("dash050InstData.R")

@@ -166,13 +166,11 @@ FullDash <- plyr::rbind.fill(CatDash3, AccDash2)
 print(paste("... ",substr(date(), 12, 19), "- cleaning up full data table..."))
 
 # cleanup import
-rm(CatDash2, AccDash1)
 FullDash1 <- unique(FullDash)
-
 
 # check duplicate GUIDs [first instance is kept; subsequent are removed]] ####
 # keep first instance:
-FullGUIDcount <- dplyr::count(FullDash, DarGlobalUniqueIdentifier)
+FullGUIDcount <- dplyr::count(FullDash1, DarGlobalUniqueIdentifier)
 
 FullDash1 <- FullDash1[order(FullDash1$DarGlobalUniqueIdentifier, FullDash1$DarCatalogNumber),]
 FullDash1$GUIDseq <- sequence(rle(as.character(FullDash1$DarGlobalUniqueIdentifier))$lengths)
@@ -239,6 +237,18 @@ colnames(QualityFull)[1] <- "QualityRank"
 
 QualityCatDar <- dplyr::count(FullDash2[which(FullDash2$RecordType=="Catalog"),], CatQual)
 colnames(QualityCatDar)[1] <- "DarFieldsFilled"
+
+
+# Memory cleanup / Garbage Collection ####
+rm(CatDash2, AccDash1, FullDash, FullDash1, FullGUIDcount)
+rm(list = c(ls(pattern = "^CatDash0[0-9]$"),
+            ls(pattern = "^CatOI"),
+            ls(pattern = "^OI_"),
+            ls(pattern = "^CatPM"),
+            ls(pattern = "^FullCheck"))) 
+
+gc()
+
 
 Log020FullBind <- warnings()
 

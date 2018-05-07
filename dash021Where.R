@@ -184,7 +184,12 @@ WhereLUTall$WhereLUT <- gsub("Localities In |No Data|^Aisa$", "", WhereLUTall$Wh
 WhereLUTall$WhereLUT[which(grepl("[[:alpha:]]",WhereLUTall$WhereLUT)<1)] <- ""
 WhereLUTall <- data.frame("WhereLutClean" = unique(WhereLUTall$WhereLUT[which(nchar(WhereLUTall$WhereLUT)>1)]))
 WhereLUTall <- data.frame("WhereLutClean"=as.character(WhereLUTall[order(WhereLUTall$WhereLutClean),]), stringsAsFactors = F)
+
+
+# Memory cleanup / Garbage collection
+# rm("FullDash2") # Gets referenced in dash028Ecoregions.R
 rm("WhereLUT1", "WhereLUT2", "WhereLUT3", "WhereLUT4", "WhereLUT5", "WhereLUT6")
+gc()
 
 Log021Where <- warnings()
 

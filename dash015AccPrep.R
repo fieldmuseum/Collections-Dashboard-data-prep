@@ -180,6 +180,13 @@ AccBasOfRec <- unique(AccBasOfRec)
 
 AccBL3 <- merge(AccBL2, AccBasOfRec, by="efmnhtransactions_key", all.x=T)
 
+# Memory cleanup
+rm(Acc, Acc1, Acc2)
+
+rm(list = c(ls(pattern = "Acc3"),
+            ls(pattern = "AccBL1"),
+            ls(pattern = "AccBL2"))) 
+
 
 # subset only the columns needed for subsequent calculations
 AccBL3 <- AccBL3[,-1]

@@ -279,6 +279,11 @@ WhenAgeLUT <- WhenAgeLUT[order(WhenAgeLUT$WhenLUT),]
 #  3-When: merge WHERE+WHAT+WHEN ####
 FullDash6csv <- merge(FullDash5csv, WhenDash5, by=c("DarGlobalUniqueIdentifier"), all.x=T)
 
+# Memory cleanup ####
+rm("FullDash4csv", "FullDash5csv")
+rm(list = ls(pattern = "WhenDash"))
+gc()
+
 Log023When <- warnings()
 
 setwd(origdir)
