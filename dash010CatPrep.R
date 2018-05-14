@@ -22,34 +22,38 @@
 print(paste(date(), "-- Starting Catalog data import -- dash010CatPrep.R"))
 
 
-# point to the directory containg the set of "Group" csv's from EMu
-setwd(paste0(origdir,"/data01raw/emuCat/"))
+# Import the set of "Group" csv's from EMu
+# setwd(paste0(origdir,"/data01raw/emuCat/"))
 
-DashList = list.files(pattern="Group.*.csv$")
-CatDash01 <- do.call(rbind, lapply(DashList, read.csv, stringsAsFactors = F, na.strings = ""))
+DashList <- list.files(path = "data01raw/emuCat/", pattern="Group.*.csv$")
+DashList2 <- paste0("data01raw/emuCat/", DashList)
+CatDash01 <- do.call(rbind, lapply(DashList2, read.csv, stringsAsFactors = F, na.strings = ""))
 
-setwd(paste0(origdir,"/data01raw"))  # up to /collprep/data01raw/
 
+# Set NA's to empty ""
+CatDash01[is.na(CatDash01)] <- ""
 
 CatDash02 <- CatDash01[order(CatDash01$DarGlobalUniqueIdentifier, CatDash01$DarCatalogNumber),-c(1,2)]
 CatDash03 <- unique(CatDash02)
 
-# clean out secondary taxon IDs
-CatDash03taxid <- CatDash03[,c("DarGlobalUniqueIdentifier",
-                               "DarScientificName",
-                               "ClaRank",
-                               "ComName_tab")]
 
-CatDash03taxid <- CatDash03taxid %>% unite(TaxonPasted, 
-                                           DarScientificName:ComName_tab, 
-                                           sep="|",
-                                           remove = TRUE)
+# Sort out good GUIDs from duplicate/bad GUIDs
+CatDash03$seq <- sequence(rle(CatDash03$DarGlobalUniqueIdentifier)$length)
 
+CatDash03guidDup <- CatDash03[which(CatDash03$seq > 1),]
+CatDash03guidBad <- CatDash03[which(nchar(CatDash03$DarGlobalUniqueIdentifier)<36),]
 
+CatDash03 <- CatDash03[which(CatDash03$seq == 1
+                             & nchar(CatDash03$DarGlobalUniqueIdentifier)==36),]
+
+# Need to keep CatDash02 for something?
 rm(CatDash01)
 
 
-# write the lumped/full/single CSV back out
-write.csv(CatDash03, file="CatDash03bu.csv", row.names = F, na="")
+# write out the lumped/full/single CSV backup
+write.csv(CatDash03, file="data01raw/CatDash03bu.csv", row.names = F, na="")
 
-setwd(origdir)  # up to /collprep/
+# write out the duplicated/bad GUIDs to be checked
+write.csv(CatDash03guidDup, file="data03check/CatDash_dupGUID.csv", row.names = F, na="")
+write.csv(CatDash03guidBad, file="data03check/CatDash_badGUID.csv", row.names = F, na="")
+
