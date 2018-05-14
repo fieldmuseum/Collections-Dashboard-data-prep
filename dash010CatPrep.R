@@ -26,13 +26,26 @@ print(paste(date(), "-- Starting Catalog data import -- dash010CatPrep.R"))
 setwd(paste0(origdir,"/data01raw/emuCat/"))
 
 DashList = list.files(pattern="Group.*.csv$")
-CatDash01 <- do.call(rbind, lapply(DashList, read.csv, stringsAsFactors = F))
+CatDash01 <- do.call(rbind, lapply(DashList, read.csv, stringsAsFactors = F, na.strings = ""))
 
 setwd(paste0(origdir,"/data01raw"))  # up to /collprep/data01raw/
 
 
 CatDash02 <- CatDash01[order(CatDash01$DarGlobalUniqueIdentifier, CatDash01$DarCatalogNumber),-c(1,2)]
 CatDash03 <- unique(CatDash02)
+
+# clean out secondary taxon IDs
+CatDash03taxid <- CatDash03[,c("DarGlobalUniqueIdentifier",
+                               "DarScientificName",
+                               "ClaRank",
+                               "ComName_tab")]
+
+CatDash03taxid <- CatDash03taxid %>% unite(TaxonPasted, 
+                                           DarScientificName:ComName_tab, 
+                                           sep="|",
+                                           remove = TRUE)
+
+
 rm(CatDash01)
 
 
