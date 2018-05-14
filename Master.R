@@ -33,19 +33,6 @@ sourceDir <- function(path, trace = TRUE, ...) {
   }
 }
 
-# usePackage <- function(p) {
-#   newPackages <- p[!(p %in% installed.packages()[, "Package"])]
-#   if(length(newPackages))
-#     install.packages(newPackages, dependencies = TRUE)
-#   cat("Packages successfully loaded:\n")
-#   sapply(p, require, character.only = TRUE, quietly = TRUE)
-# }
-# 
-# simpleCap <- function(x) {
-#   s <- strsplit(tolower(x), " ")[[1]]
-#   paste(toupper(substring(s, 1, 1)), substring(s, 2),
-#         sep = "", collapse = " ")
-# }
 
 sourceDir(paste(getwd(),"/functions",sep=""))
 
@@ -66,17 +53,17 @@ if (DarYN=="Y") { source("dash005DarPrep.R") }
 
 # Added OI recordset import 06-feb-2018
 # ( CSV from OI's shared XLSX report )
-source("dash006OIcsvImport.R", verbose = T)
+source("dash006OIcsvImport.R") 
 
 # Added Penn-Museum recordset import 26-jan-2018
 # ( https://www.penn.museum/collections/objects/data.php )
-source("dash007PMcsvImport.R", verbose = T)
+source("dash007PMcsvImport.R")
 
 # if (!file.exists("data01raw/CatDash03bu.csv")) { source("dash010CatPrep.R") }
-source("dash010CatPrep.R", verbose = T)
-if (AccYN=="Y") { source("dash015AccPrep.R", verbose = T) }
+source("dash010CatPrep.R")
+if (AccYN=="Y") { source("dash015AccPrep.R") }
 
-source("dash020FullBind.R", verbose = T)
+source("dash020FullBind.R")
 source("dash021Where.R", verbose = T)
 source("dash022What.R", verbose = T)
 source("dash023When.R", verbose = T)
@@ -92,4 +79,3 @@ source("dash030FullExport.R", verbose = T)
 
 # Institution summaries?
 #source("dash050InstData.R")
-
