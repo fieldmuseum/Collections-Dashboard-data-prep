@@ -18,12 +18,22 @@ print(paste(date(), "-- Starting PM data import -- dash007PMcsvImport.R"))
 # point to the directory containg the set of "Group" csv's from EMu
 setwd(paste0(origdir,"/data01raw/PM20180121/"))
 
-PMList = list.files(pattern="all.*.csv$")
-CatPM01 <- do.call(rbind, lapply(PMList, read.csv, stringsAsFactors = F))
+PMList = list.files(pattern="^all.*.csv$")
+CatPM01b <- do.call(rbind, lapply(PMList, read.csv, stringsAsFactors = F))
+
+colnames(CatPM01b)[1] <- "irn"
+
+PM_MM <- read.csv(file = "UPMAA_all-data_multimedia.csv", 
+                  fileEncoding = "UTF-8",
+                  header = F,
+                  stringsAsFactors = F)
+
+colnames(PM_MM) <- c("irn","HasMM","MultimediaGUID")
+
+CatPM01 <-merge(CatPM01b, PM_MM[1:3], by = "irn", all.x = T)
+
 
 setwd(paste0(origdir,"/data01raw/emuCat"))  # up to /collprep/data01raw/
-
-colnames(CatPM01)[1] <- "irn"
 
 CatPM02 <- CatPM01[order(CatPM01$irn),]
 CatPM02 <- unique(CatPM02)
@@ -84,7 +94,7 @@ CatPM04 <- data.frame(
   "CatDepartment" = "", # find out what Penn calls it
   "DarCatalogNumber" = CatPM03$object_number,
   "DarCollector" = "",
-  "MulHasMultiMedia" = "",
+  "MulHasMultiMedia" = CatPM03$HasMM,
   "DarStateProvince" = "",
   "DarInstitutionCode" = "PM",
   stringsAsFactors = F
