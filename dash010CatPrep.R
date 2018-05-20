@@ -41,10 +41,10 @@ CatDash03 <- unique(CatDash02)
 CatDash03$seq <- sequence(rle(CatDash03$DarGlobalUniqueIdentifier)$length)
 
 CatDash03guidDup <- CatDash03[which(CatDash03$seq > 1),]
-CatDash03guidBad <- CatDash03[which(nchar(CatDash03$DarGlobalUniqueIdentifier)<36),]
+CatDash03guidBad <- CatDash03[which(nchar(CatDash03$DarGlobalUniqueIdentifier)<1),]
 
 CatDash03 <- CatDash03[which(CatDash03$seq == 1
-                             & nchar(CatDash03$DarGlobalUniqueIdentifier)==36),]
+                             & nchar(CatDash03$DarGlobalUniqueIdentifier)>0),]
 
 # Need to keep CatDash02 for something?
 rm(CatDash01)

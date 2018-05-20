@@ -64,18 +64,18 @@ source("dash010CatPrep.R")
 if (AccYN=="Y") { source("dash015AccPrep.R") }
 
 source("dash020FullBind.R")
-source("dash021Where.R", verbose = T)
-source("dash022What.R", verbose = T)
-source("dash023When.R", verbose = T)
-source("dash024Who.R", verbose = T)
+source("dash021Where.R")
+source("dash022What.R")
+source("dash023When.R")
+source("dash024Who.R")
 
 # Added these [May-2017]:
-source("dash025Experience.R", verbose = T)
-source("dash026LoansPrep.R", verbose = T)
-source("dash027VisitPrep.R", verbose = T)
-source("dash028Ecoregions.R", verbose = T)
+source("dash025Experience.R")
+source("dash026LoansPrep.R")
+source("dash027VisitPrep.R")
+source("dash028Ecoregions.R")
 
-source("dash030FullExport.R", verbose = T)
+source("dash030FullExport.R")
 
 # Institution summaries?
 #source("dash050InstData.R")
