@@ -70,24 +70,25 @@ _WhenAge-related fields:_
 
 #### The full list of efmnhtransactions (accession record) fields is as follows:
 _Count-related fields (used for calculating backlogged items):_
- - irn
- - AccCatalogue
- - AccTotalItems
- - AccTotalObjects
- - AccCount_tab
- - PriAccessionNumberRef.CatCatalog
- - PriAccessionNumberRef.DarIndividualCount
- - PriAccessionNumberRef.irn
- - PriAccessionNumberRef.DarBasisOfRecord
- - PriAccessionNumberRef.CatItemsInv
+ - irn = internal record number; unique identifier for an accession record in the FMNH collection management system
+ - AccCatalogue = FMNH Collection area for the accession
+ - AccTotalItems = Total number of specimens (natural history) or objects (cultural)
+ - AccTotalObjects = Total number of lots
+ - AccCount_tab = The number of pieces in the lot per geographical region
+ (Excluded from dashboard v3)
+ - (PriAccessionNumberRef.CatCatalog = FMNH Collection area for a catalogue record associated with the accession)
+ - (PriAccessionNumberRef.DarIndividualCount = dwc:individualCount for the associated catalogue record)
+ - (PriAccessionNumberRef.irn = internal record number for the associated catalogue record)
+ - (PriAccessionNumberRef.DarBasisOfRecord = dwc:basisOfRecord for the associated catalogue record)
+ - (PriAccessionNumberRef.CatItemsInv = Total number of specimens or objects represented by the associated catalogue record)
  
 _What- & Who-related fields:_
- - AccDescription_tab
- - AccAccessionDescription
+ - AccDescription_tab 
+ - AccAccessionDescription 
 
 _Where-related fields:_
- - AccGeography_tab
- - AccLocality
+ - AccGeography_tab = geographic coverage of the accession
+ - AccLocality = specific locality related to the accession
  - AccCollectionEventRef.ColSiteRef.LocContinent_tab
  - AccCollectionEventRef.ColSiteRef.LocCountry_tab
  - AccCollectionEventRef.ColSiteRef.LocOcean_tab
