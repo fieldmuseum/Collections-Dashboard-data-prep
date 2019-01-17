@@ -35,6 +35,7 @@ _Core and Quality-related fields:_
  - DarCollector
  - CatLegalStatus
  - DarStateProvince
+ - PriAccessionNumberRef.(irn, AccAccessionNo)
  
 _Where-related fields:_
  - DarLatitude
