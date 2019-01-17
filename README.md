@@ -75,7 +75,8 @@ _Count-related fields (used for calculating backlogged items):_
  - AccTotalItems = Total number of specimens (natural history) or objects (cultural)
  - AccTotalObjects = Total number of lots
  - AccCount_tab = The number of pieces in the lot per geographical region
- (Excluded from dashboard v3)
+ 
+ _(Excluded from dashboard v3)_
  - (PriAccessionNumberRef.CatCatalog = FMNH Collection area for a catalogue record associated with the accession)
  - (PriAccessionNumberRef.DarIndividualCount = dwc:individualCount for the associated catalogue record)
  - (PriAccessionNumberRef.irn = internal record number for the associated catalogue record)
